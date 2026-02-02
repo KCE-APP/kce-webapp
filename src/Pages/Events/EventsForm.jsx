@@ -1,5 +1,7 @@
 import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Form, Button, Row, Col, Card } from "react-bootstrap";
+import ReactQuill from "react-quill-new";
+import "quill/dist/quill.snow.css";
 
 const EventsForm = forwardRef(
   ({ initialData, onSave, onCancel, setIsDirty }, ref) => {
@@ -63,7 +65,10 @@ const EventsForm = forwardRef(
     const validate = () => {
       const newErrors = {};
       if (!form.title.trim()) newErrors.title = "Event Title is required";
-      if (!form.description.trim())
+      const strippedDescription = form.description
+        .replace(/<[^>]+>/g, "")
+        .trim();
+      if (!strippedDescription)
         newErrors.description = "Description is required";
       if (!form.startDate) newErrors.startDate = "Start Date is required";
       if (!form.endDate) newErrors.endDate = "End Date is required";
@@ -138,6 +143,13 @@ const EventsForm = forwardRef(
         });
       }
     }, [initialData]);
+
+    const handleDescriptionChange = (value) => {
+      setForm((prev) => ({ ...prev, description: value }));
+      if (errors.description) {
+        setErrors((prev) => ({ ...prev, description: null }));
+      }
+    };
 
     const handleChange = (e) => {
       const { name, value, type, checked, files } = e.target;
@@ -242,19 +254,35 @@ const EventsForm = forwardRef(
                   <Form.Label>
                     Description <span className="text-danger">*</span>
                   </Form.Label>
-                  <Form.Control
-                    as="textarea"
-                    name="description"
+                  <ReactQuill
+                    theme="snow"
                     value={form.description}
-                    onChange={handleChange}
+                    onChange={handleDescriptionChange}
                     placeholder="Enter event description"
-                    style={{ height: "120px", borderRadius: "6px" }}
-                    isInvalid={!!errors.description}
-                    className="shadow-none"
+                    style={{ height: "150px", marginBottom: "50px" }}
+                    modules={{
+                      toolbar: [
+                        [{ header: [1, 2, 3, 4, 5, 6, false] }],
+                        [{ font: [] }],
+                        ["bold", "italic", "underline", "strike", "blockquote"],
+                        [
+                          { list: "ordered" },
+                          { list: "bullet" },
+                          { indent: "-1" },
+                          { indent: "+1" },
+                        ],
+                       
+                        [{ color: [] }, { background: [] }],
+                        [{ align: [] }],
+                        ["clean"],
+                      ],
+                    }}
                   />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.description}
-                  </Form.Control.Feedback>
+                  {errors.description && (
+                    <div className="text-danger small mt-1">
+                      {errors.description}
+                    </div>
+                  )}
                 </Form.Group>
               </Col>
             </Row>
