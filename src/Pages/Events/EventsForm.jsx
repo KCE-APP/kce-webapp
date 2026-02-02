@@ -16,11 +16,13 @@ const EventsForm = forwardRef(
       mode: "",
       organizer: "",
       type: "",
+      otherType: "",
       visibility: "",
       targetAudience: "",
       status: true,
       eventDate: "",
       eventImage: "",
+      eventUrl: "",
     });
 
     const [errors, setErrors] = useState({});
@@ -36,7 +38,12 @@ const EventsForm = forwardRef(
                 if (form[key] instanceof File) {
                   formData.append("eventImage", form[key]);
                 }
-              } else {
+              } else if (key === "type") {
+                formData.append(
+                  "type",
+                  form.type === "Others" ? form.otherType : form.type,
+                );
+              } else if (key !== "otherType") {
                 formData.append(key, form[key]);
               }
             });
@@ -66,19 +73,30 @@ const EventsForm = forwardRef(
       if (!form.mode) newErrors.mode = "Mode is required";
       if (!form.organizer.trim()) newErrors.organizer = "Organizer is required";
       if (!form.type) newErrors.type = "Event Type is required";
+      if (form.type === "Others" && !form.otherType.trim()) {
+        newErrors.otherType = "Please specify the event type";
+      }
       if (!form.visibility) newErrors.visibility = "Visibility is required";
       if (!form.targetAudience.trim())
         newErrors.targetAudience = "Target Audience is required";
       if (!form.eventImage || form.eventImage === "") {
         newErrors.eventImage = "Event Image is required";
       }
+      if (!form.eventUrl.trim()) {
+        newErrors.eventUrl = "Event URL is required";
+      }
 
-      if (
-        form.startDate &&
-        form.endDate &&
-        new Date(form.startDate) > new Date(form.endDate)
-      ) {
+      const start = new Date(form.startDate);
+      const end = new Date(form.endDate);
+      const eventD = new Date(form.eventDate);
+
+      if (form.startDate && form.endDate && start > end) {
         newErrors.endDate = "End Date cannot be before Start Date";
+      }
+
+      if (form.eventDate && form.endDate && eventD <= end) {
+        newErrors.eventDate =
+          "Event Date should be greater than Registration End Date";
       }
 
       setErrors(newErrors);
@@ -87,6 +105,15 @@ const EventsForm = forwardRef(
 
     useEffect(() => {
       if (initialData) {
+        const standardTypes = [
+          "Workshop",
+          "Competition",
+          "Hackathon",
+          "Cultural",
+          "Seminar",
+        ];
+        const isStandardType = standardTypes.includes(initialData.type);
+
         setForm({
           title: initialData.title || "",
           description: initialData.description || "",
@@ -98,7 +125,8 @@ const EventsForm = forwardRef(
           venue: initialData.venue || "",
           mode: initialData.mode || "",
           organizer: initialData.organizer || "",
-          type: initialData.type || "",
+          type: isStandardType ? initialData.type : "Others",
+          otherType: isStandardType ? "" : initialData.type || "",
           visibility: initialData.visibility || "",
           targetAudience: initialData.targetAudience || "",
           status: initialData.status !== undefined ? initialData.status : true,
@@ -106,6 +134,7 @@ const EventsForm = forwardRef(
             ? initialData.eventDate.split("T")[0]
             : "",
           eventImage: initialData.eventImage || "",
+          eventUrl: initialData.eventUrl || "",
         });
       }
     }, [initialData]);
@@ -121,6 +150,10 @@ const EventsForm = forwardRef(
       // Clear error
       if (errors[name]) {
         setErrors({ ...errors, [name]: null });
+      }
+
+      if (name === "type" && value !== "Others" && errors.otherType) {
+        setErrors((prev) => ({ ...prev, otherType: null }));
       }
 
       if (setIsDirty) setIsDirty(true);
@@ -139,7 +172,12 @@ const EventsForm = forwardRef(
               if (form[key] instanceof File) {
                 formData.append("eventImage", form[key]);
               }
-            } else {
+            } else if (key === "type") {
+              formData.append(
+                "type",
+                form.type === "Others" ? form.otherType : form.type,
+              );
+            } else if (key !== "otherType") {
               formData.append(key, form[key]);
             }
           });
@@ -450,6 +488,28 @@ const EventsForm = forwardRef(
               </Col>
             </Row>
 
+            <Row className="mb-4">
+              <Col md={12}>
+                <Form.Group controlId="formEventUrl">
+                  <Form.Label>
+                    Event URL <span className="text-danger">*</span>
+                  </Form.Label>
+                  <Form.Control
+                    name="eventUrl"
+                    value={form.eventUrl}
+                    placeholder="Enter event URL (e.g., https://meet.google.com/...)"
+                    onChange={handleChange}
+                    isInvalid={!!errors.eventUrl}
+                    className="shadow-none"
+                    style={{ borderRadius: "6px" }}
+                  />
+                  <Form.Control.Feedback type="invalid">
+                    {errors.eventUrl}
+                  </Form.Control.Feedback>
+                </Form.Group>
+              </Col>
+            </Row>
+
             <h6
               className="text-uppercase text-secondary fw-bold small mb-3 border-bottom pb-2 mt-4"
               style={{ letterSpacing: "1px" }}
@@ -481,6 +541,24 @@ const EventsForm = forwardRef(
                   <Form.Control.Feedback type="invalid">
                     {errors.type}
                   </Form.Control.Feedback>
+
+                  {form.type === "Others" && (
+                    <>
+                      <Form.Control
+                        type="text"
+                        name="otherType"
+                        placeholder="Specify Event Type"
+                        value={form.otherType}
+                        onChange={handleChange}
+                        isInvalid={!!errors.otherType}
+                        className="mt-2 shadow-none"
+                        style={{ borderRadius: "6px" }}
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        {errors.otherType}
+                      </Form.Control.Feedback>
+                    </>
+                  )}
                 </Form.Group>
               </Col>
               <Col md={4} className="mb-3 mb-md-0">
