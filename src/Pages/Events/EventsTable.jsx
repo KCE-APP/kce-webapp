@@ -34,7 +34,9 @@ export default function EventsTable({
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
   const [selectedTitle, setSelectedTitle] = useState("");
+
   const [isModelView, setIsModelView] = useState(false);
+  const [exportLimit, setExportLimit] = useState(10);
 
   const handleNotifyClick = (event) => {
     setSelectedEvent(event);
@@ -170,9 +172,27 @@ export default function EventsTable({
           ></div>
 
           {/* Exports */}
-          <div className="d-flex gap-2">
+          <div className="d-flex align-items-center gap-2">
+            <span
+              className="text-muted small fw-bold d-none d-md-block"
+              style={{ fontSize: "0.75rem", letterSpacing: "0.05em" }}
+            >
+              LIMIT:
+            </span>
+
+            <Form.Select
+              value={exportLimit}
+              onChange={(e) => setExportLimit(e.target.value)}
+              className="filter-select py-2 ps-3 pe-5"
+              style={{ width: "auto", minWidth: "100px" }}
+            >
+              <option value="10">10</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+              <option value="1000">All</option>
+            </Form.Select>
             <button
-              onClick={onExportExcel}
+              onClick={() => onExportExcel(exportLimit)}
               className="export-btn export-btn-excel border-0"
             >
               <FileDownloadIcon fontSize="small" /> <span>Excel</span>

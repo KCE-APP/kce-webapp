@@ -272,10 +272,10 @@ export default function AchieversPage() {
     }
   };
 
-  const handleExportExcel = async () => {
+  const handleExportExcel = async (limit = 1000) => {
     try {
       const res = await api.get("/achievers", {
-        params: { limit: 1000, search: searchTerm, college: filterCollege },
+        params: { limit: limit, search: searchTerm, college: filterCollege },
       });
       const exportData = res.data.data || res.data;
 

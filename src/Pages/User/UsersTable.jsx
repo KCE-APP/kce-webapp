@@ -87,8 +87,10 @@ export default function UsersTable({
                   <th className="ps-4" style={{ width: "15%" }}>
                     User Details
                   </th>
-                  <th style={{ width: "25%" }}>College</th>
-                  <th style={{ width: "25%" }}>Email</th>
+                  <th style={{ width: "15%" }}>Roll No</th>
+                  <th style={{ width: "20%" }}>Email</th>
+                  <th style={{ width: "20%" }}>College</th>
+                  
                   <th style={{ width: "10%" }}>Role</th>
                  
                   {/* <th className="text-end pe-4" style={{ width: "15%" }}>
@@ -107,11 +109,11 @@ export default function UsersTable({
                       
                       </td>
                       <td>
-                        {u.collegeName ? (
+                        {u.rollNo ? (
                           <span
-                            className={`modern-badge ${getBadgeClassOfCollege(u.collegeName)}`}
+                            className="text-dark fw-medium"
                           >
-                            {u.collegeName}
+                            {u.rollNo}
                           </span>
                         ) : (
                           <span className="text-muted">-</span>
@@ -121,6 +123,17 @@ export default function UsersTable({
                         <span className="text-secondary fw-medium">
                           {u.email}
                         </span>
+                      </td>
+                      <td>
+                        {u.collegeName ? (
+                          <span
+                            className={`modern-badge ${getBadgeClassOfCollege(u.collegeName)}`}
+                          >
+                            {u.collegeName}
+                          </span>
+                        ) : (
+                          <span className="text-muted">-</span>
+                        )}
                       </td>
                       <td>
                         <span className="text-dark small fw-bold text-uppercase">

@@ -19,15 +19,45 @@ import SearchIcon from "@mui/icons-material/Search";
 import FilterListIcon from "@mui/icons-material/FilterList";
 import { Tooltip } from "@mui/material";
 // Reaction Icons
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import CelebrationIcon from "@mui/icons-material/Celebration";
-import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
+
 import Swal from "sweetalert2";
 import Logo from "../../assets/logo.png";
 import KCELogo from "../../assets/KCE_LOGO.webp";
 import KITLogo from "../../assets/KIT-LOGO.png";
 import TablePlaceholder from "../../component/TablePlaceholder";
+const REACTION_TYPES = [
+  {
+    id: "clap",
+    image: "https://cdn-icons-png.flaticon.com/512/1961/1961454.png",
+    color: "#f2dbb0ff",
+    label: "Clap",
+  },
+  {
+    id: "trophy",
+    image: "https://cdn-icons-png.flaticon.com/512/419/419952.png",
+    color: "#feffa9ff",
+    label: "Trophy",
+  },
+  {
+    id: "respect",
+    image: "https://cdn-icons-png.flaticon.com/512/11252/11252520.png",
+    color: "#b6ffcbff",
+    label: "Respect",
+  },
+  {
+    id: "goat",
+    image: "https://cdn-icons-png.flaticon.com/512/616/616714.png",
+    color: "#ffeec1ff",
+    label: "Goat",
+  },
+  {
+    id: "finger_heart",
+    image: "https://cdn-icons-png.flaticon.com/512/9812/9812568.png",
+    color: "#f1c0d9ff",
+    label: "Lovely",
+  },
+];
+
 export default function AchieversTable({
   data,
   loading,
@@ -47,7 +77,9 @@ export default function AchieversTable({
   // Image Modal State
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
+
   const [selectedTitle, setSelectedTitle] = useState("");
+  const [exportLimit, setExportLimit] = useState(10);
 
   // Logic moved to parent component (Server-side pagination)
 
@@ -171,9 +203,27 @@ export default function AchieversTable({
           ></div>
 
           {/* Exports */}
-          <div className="d-flex gap-2">
+          <div className="d-flex align-items-center gap-2">
+            <span
+              className="text-muted small fw-bold d-none d-md-block"
+              style={{ fontSize: "0.75rem", letterSpacing: "0.05em" }}
+            >
+              LIMIT:
+            </span>
+
+            <Form.Select
+              value={exportLimit}
+              onChange={(e) => setExportLimit(e.target.value)}
+              className="filter-select py-2 ps-3 pe-5"
+              style={{ width: "auto", minWidth: "100px" }}
+            >
+              <option value="10">10</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+              <option value="1000">All</option>
+            </Form.Select>
             <button
-              onClick={onExportExcel}
+              onClick={() => onExportExcel(exportLimit)}
               className="export-btn export-btn-excel border-0"
             >
               <FileDownloadIcon fontSize="small" /> <span>Excel</span>
@@ -264,66 +314,26 @@ export default function AchieversTable({
                       </td>
                       <td>
                         <div className="d-flex align-items-center gap-2">
-                          {/* Like */}
-                          <div
-                            className="d-flex align-items-center  text-muted small"
-                            title="Likes"
-                          >
-                            <ThumbUpIcon
-                              style={{ fontSize: "16px", color: "#64748b" }}
-                            />
-                            <span className="fw-semibold">
-                              {a.reactions?.r1 || 0}
-                            </span>
-                          </div>
-                          {/* Heart */}
-                          <div
-                            className="d-flex align-items-center  text-muted small"
-                            title="Hearts"
-                          >
-                            <FavoriteIcon
-                              style={{ fontSize: "16px", color: "#ef4444" }}
-                            />
-                            <span className="fw-semibold">
-                              {a.reactions?.r2 || 0}
-                            </span>
-                          </div>
-                          {/* Clap */}
-                          <div
-                            className="d-flex align-items-center  text-muted small"
-                            title="Claps"
-                          >
-                            <CelebrationIcon
-                              style={{ fontSize: "16px", color: "#eab308" }}
-                            />
-                            <span className="fw-semibold">
-                              {a.reactions?.r3 || 0}
-                            </span>
-                          </div>
-                          {/* Fire */}
-                          <div
-                            className="d-flex align-items-center  text-muted small"
-                            title="Fire"
-                          >
-                            <LocalFireDepartmentIcon
-                              style={{ fontSize: "16px", color: "#f97316" }}
-                            />
-                            <span className="fw-semibold">
-                              {a.reactions?.r4 || 0}
-                            </span>
-                          </div>
-
-                          <div
-                            className="d-flex align-items-center  text-muted small"
-                            title="Fire"
-                          >
-                            <LocalFireDepartmentIcon
-                              style={{ fontSize: "16px", color: "#f97316" }}
-                            />
-                            <span className="fw-semibold">
-                              {a.reactions?.r5 || 0}
-                            </span>
-                          </div>
+                          {REACTION_TYPES.map((reaction, index) => (
+                            <div
+                              key={reaction.id}
+                              className="d-flex align-items-center text-muted small"
+                              title={reaction.label}
+                            >
+                              <img
+                                src={reaction.image}
+                                alt={reaction.label}
+                                style={{
+                                  width: "20px",
+                                  height: "20px",
+                                  marginRight: "4px",
+                                }}
+                              />
+                              <span className="fw-semibold">
+                                {a.reactions?.[`r${index + 1}`] || 0}
+                              </span>
+                            </div>
+                          ))}
                         </div>
                       </td>
                       <td className="text-center">
@@ -507,7 +517,7 @@ export default function AchieversTable({
                 selectedCollege === "KCE"
                   ? KCELogo
                   : selectedCollege === "KIT"
-                    ? KITLogo 
+                    ? KITLogo
                     : Logo
               }
               alt="Karpagam Institutions"
@@ -531,9 +541,9 @@ export default function AchieversTable({
               style={{
                 letterSpacing: "1px",
                 fontSize: "0.85rem",
-                backgroundColor: "#fffbeb", 
-                color: "#92400e", 
-                border: "1px solid #fcd34d", 
+                backgroundColor: "#fffbeb",
+                color: "#92400e",
+                border: "1px solid #fcd34d",
               }}
             >
               🏆 Student Achievements
@@ -543,12 +553,11 @@ export default function AchieversTable({
           <Row className="g-3 justify-content-center">
             {studentData.map((student, index) => {
               const avatarColor = getAvatarColor(student.name);
-              
+
               const total = studentData.length;
-              let colSize = 6; 
-              if (total === 1)
-                colSize = 8; 
-              else if (total > 6) colSize = 4; 
+              let colSize = 6;
+              if (total === 1) colSize = 8;
+              else if (total > 6) colSize = 4;
 
               return (
                 <Col md={colSize} key={student._id || index}>
@@ -560,7 +569,6 @@ export default function AchieversTable({
                       transition: "transform 0.2s ease",
                     }}
                   >
-
                     <div
                       className="position-absolute bg-white shadow-sm rounded-circle d-flex align-items-center justify-content-center border"
                       style={{
@@ -637,18 +645,18 @@ function getColorForCollege(college) {
   if (!college) return "#bdbdbd";
   switch (college.toUpperCase()) {
     case "KCE":
-      return "#1976d2"; 
+      return "#1976d2";
     case "KIT":
-      return "#ed6c02"; 
+      return "#ed6c02";
     case "KAHE":
-      return "#2e7d32"; 
+      return "#2e7d32";
     default:
       return "#9c27b0";
   }
 }
 
 function getBadgeClassOfCollege(college) {
-  if (!college) return "bg-light text-dark"; 
+  if (!college) return "bg-light text-dark";
   switch (college.toUpperCase()) {
     case "KCE":
       return "badge-college-kce";
@@ -665,25 +673,25 @@ function getAvatarColor(name) {
   if (!name) return { bg: "#e2e8f0", text: "#64748b" };
 
   const bgColors = [
-    "#fee2e2", 
-    "#ffedd5", 
-    "#fef3c7", 
-    "#dcfce7", 
-    "#dbeafe", 
-    "#e0e7ff", 
-    "#fae8ff", 
-    "#fce7f3", 
+    "#fee2e2",
+    "#ffedd5",
+    "#fef3c7",
+    "#dcfce7",
+    "#dbeafe",
+    "#e0e7ff",
+    "#fae8ff",
+    "#fce7f3",
   ];
 
   const textColors = [
-    "#ef4444", 
-    "#f97316", 
-    "#f59e0b", 
-    "#22c55e", 
-    "#3b82f6", 
-    "#6366f1", 
-    "#d946ef", 
-    "#ec4899", 
+    "#ef4444",
+    "#f97316",
+    "#f59e0b",
+    "#22c55e",
+    "#3b82f6",
+    "#6366f1",
+    "#d946ef",
+    "#ec4899",
   ];
 
   let hash = 0;

@@ -152,6 +152,11 @@ const AchieversForm = forwardRef(
     const handleChange = (e) => {
       const { name, value, type, checked, files } = e.target;
 
+      // Restrict Batch to numbers only
+      if (name === "batch" && !/^\d*$/.test(value)) {
+        return;
+      }
+
       // If switching away from 'Others', clear the custom input
       if (name === "category" && value !== "Others") {
         setForm({
@@ -219,7 +224,13 @@ const AchieversForm = forwardRef(
       if (form.category === "Others" && !form.otherCategory.trim()) {
         newErrors.otherCategory = "Please specify the category";
       }
-      if (!form.batch.trim()) newErrors.batch = "Batch is required";
+      if (!form.batch.trim()) {
+        newErrors.batch = "Batch is required";
+      } else if (!/^\d{4}$/.test(form.batch)) {
+        newErrors.batch = "Batch must be a 4-digit number";
+      } else if (parseInt(form.batch, 10) <= 2000) {
+        newErrors.batch = "Batch year must be greater than 2000";
+      }
       const strippedDescription = form.description
         .replace(/<[^>]+>/g, "")
         .trim();
