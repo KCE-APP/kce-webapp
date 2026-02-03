@@ -5,15 +5,15 @@ import FileDownloadIcon from "@mui/icons-material/FileDownloadOutlined";
 import EditIcon from "@mui/icons-material/EditOutlined";
 import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import SearchIcon from "@mui/icons-material/Search";
+import NotificationsIcon from "@mui/icons-material/NotificationsOutlined";
+
 import { Tooltip } from "@mui/material";
 // Reaction Icons
-import ThumbUpIcon from "@mui/icons-material/ThumbUp";
-import FavoriteIcon from "@mui/icons-material/Favorite";
-import CelebrationIcon from "@mui/icons-material/Celebration";
-import LocalFireDepartmentIcon from "@mui/icons-material/LocalFireDepartment";
+
 import Swal from "sweetalert2";
 
 import TablePlaceholder from "../../component/TablePlaceholder";
+import api from "../../api/axios";
 
 export default function EventsTable({
   data,
@@ -34,6 +34,40 @@ export default function EventsTable({
   const [showModal, setShowModal] = useState(false);
   const [selectedImage, setSelectedImage] = useState("");
   const [selectedTitle, setSelectedTitle] = useState("");
+  const [isModelView, setIsModelView] = useState(false);
+
+  const handleNotifyClick = (event) => {
+    setSelectedEvent(event);
+    setShowNotifyModal(true);
+  };
+
+  const handleCloseNotifyModal = () => {
+    setShowNotifyModal(false);
+    setSelectedEvent(null);
+  };
+
+  const handleSendNotification = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user"));
+
+      setNotifyLoading(true);
+
+      await api.post(`/events/post-event`, {
+        id: selectedEvent._id,
+        userId: user.id,
+      });
+      Swal.fire("Success", "Notification sent to users", "success");
+      handleCloseNotifyModal();
+    } catch (err) {
+      Swal.fire("Error", "Failed to send notification", "error");
+    } finally {
+      setNotifyLoading(false);
+    }
+  };
+
+  const [showNotifyModal, setShowNotifyModal] = useState(false);
+  const [selectedEvent, setSelectedEvent] = useState(null);
+  const [notifyLoading, setNotifyLoading] = useState(false);
 
   const handleViewImage = (title, imageUrl) => {
     setSelectedTitle(title);
@@ -330,6 +364,14 @@ export default function EventsTable({
                               <DeleteIcon fontSize="small" />
                             </button>
                           </Tooltip>
+                          <Tooltip title="Notify Users">
+                            <button
+                              className="action-btn notify"
+                              onClick={() => handleNotifyClick(e)}
+                            >
+                              <NotificationsIcon fontSize="small" />
+                            </button>
+                          </Tooltip>
                         </div>
                       </td>
                     </tr>
@@ -381,6 +423,40 @@ export default function EventsTable({
             />
           </Pagination>
         </div>
+      )}
+
+      {showNotifyModal && selectedEvent && (
+        <Modal show centered onHide={handleCloseNotifyModal}>
+          <Modal.Header closeButton>
+            <Modal.Title>Notify Users</Modal.Title>
+          </Modal.Header>
+
+          <Modal.Body>
+            <p className="mb-2">You are about to notify users about:</p>
+            <div className="p-3 bg-light rounded">
+              <strong>{selectedEvent.title}</strong>
+              <div className="text-muted small">
+                {selectedEvent.campus} •{" "}
+                {selectedEvent.eventDate
+                  ? new Date(selectedEvent.eventDate).toLocaleDateString()
+                  : "No Date"}
+              </div>
+            </div>
+          </Modal.Body>
+
+          <Modal.Footer>
+            <Button variant="secondary" onClick={handleCloseNotifyModal}>
+              Cancel
+            </Button>
+            <Button
+              variant="primary"
+              onClick={handleSendNotification}
+              disabled={notifyLoading}
+            >
+              {notifyLoading ? "Sending..." : "Send Notification"}
+            </Button>
+          </Modal.Footer>
+        </Modal>
       )}
 
       {/* Image Preview Modal */}
