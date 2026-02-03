@@ -137,10 +137,10 @@ export default function EventsPage() {
     }
   };
 
-  const handleExportExcel = async () => {
+  const handleExportExcel = async (limit = 1000) => {
     try {
       const res = await api.get("/events", {
-        params: { limit: 1000, search: searchTerm, campus: filterCampus },
+        params: { limit: limit, search: searchTerm, campus: filterCampus },
       });
       const data = res.data.data || res.data;
       const worksheet = XLSX.utils.json_to_sheet(

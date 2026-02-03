@@ -38,7 +38,7 @@ function Header() {
               className="fw-bold color1 d-none d-sm-block"
               style={{ fontSize: "1.25rem" }}
             >
-              Karpagam Spot
+              Karpagam SpotLight
             </span>
           </Navbar.Brand>
 

@@ -3,6 +3,13 @@ import { Form, Button, Row, Col, Card } from "react-bootstrap";
 import ReactQuill from "react-quill-new";
 import "quill/dist/quill.snow.css";
 
+const getNextDay = (dateString) => {
+  if (!dateString) return undefined;
+  const date = new Date(dateString);
+  date.setDate(date.getDate() + 1);
+  return date.toISOString().split("T")[0];
+};
+
 const EventsForm = forwardRef(
   ({ initialData, onSave, onCancel, setIsDirty }, ref) => {
     const isEditMode = !!initialData;
@@ -271,7 +278,7 @@ const EventsForm = forwardRef(
                           { indent: "-1" },
                           { indent: "+1" },
                         ],
-                       
+
                         [{ color: [] }, { background: [] }],
                         [{ align: [] }],
                         ["clean"],
@@ -411,6 +418,7 @@ const EventsForm = forwardRef(
                   <Form.Control
                     type="date"
                     name="endDate"
+                    min={form.startDate}
                     value={form.endDate}
                     onChange={handleChange}
                     isInvalid={!!errors.endDate}
@@ -433,6 +441,7 @@ const EventsForm = forwardRef(
                   <Form.Control
                     type="date"
                     name="eventDate"
+                    min={getNextDay(form.endDate)}
                     value={form.eventDate}
                     onChange={handleChange}
                     onClick={(e) =>
