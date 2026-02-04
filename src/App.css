@@ -34,7 +34,8 @@ nav.navbar {
 }
 
 .page-content-wrapper {
-  margin-left: 200px; /* Exact sidebar width */
+  margin-left: 170px; /* Exact sidebar width */
+  margin-right: -20px;
   flex-grow: 1;
   padding: 2rem;
   width: calc(100% - 200px); /* Ensure accurate full width usage without overflow */
