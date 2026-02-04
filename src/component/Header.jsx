@@ -25,8 +25,8 @@ function Header() {
 
   return (
     <>
-      <Navbar bg="white" expand="lg" className="shadow-sm mb-4 py-3">
-        <Container>
+      <Navbar bg="white" expand="lg" className="shadow-sm mb-4 ">
+        <Container fluid={true}>
           <Navbar.Brand href="/" className="d-flex align-items-center gap-3">
             <img
               src={logo}

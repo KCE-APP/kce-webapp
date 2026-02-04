@@ -69,6 +69,9 @@ const LoginPage = () => {
       const response = await api.post("/auth/login", { email, password });
 
       if (response.data.message === "Login successful") {
+        if (response.data.token) {
+          localStorage.setItem("token", response.data.token);
+        }
         localStorage.setItem("user", JSON.stringify(response.data.user));
 
         // Optional: Show success alert before redirecting
