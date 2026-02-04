@@ -1,6 +1,5 @@
-
 export function formatImageUrl(url) {
-  if (!url) return "";
+  if (!url || typeof url !== "string") return "";
 
   if (!url.startsWith("http") && !url.startsWith("https")) {
     const cleanPath = url.replace(/\\/g, "/");

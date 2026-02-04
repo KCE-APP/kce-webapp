@@ -703,7 +703,7 @@ function getAvatarColor(name) {
   return { bg: bgColors[index], text: textColors[index] };
 }
 function formatImageUrl(url) {
-  if (!url) return "";
+  if (!url || typeof url !== "string") return "";
 
   if (!url.startsWith("http") && !url.startsWith("https")) {
     const cleanPath = url.replace(/\\/g, "/");

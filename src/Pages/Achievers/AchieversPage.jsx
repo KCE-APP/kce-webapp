@@ -293,8 +293,13 @@ export default function AchieversPage() {
           Description: item.description,
           EventDate: item.eventDate ? item.eventDate.split("T")[0] : "",
           Status: item.status ? "Active" : "Closed",
-          Poster_Image:formatImageUrl(item.posterImage),
-          studentData:formatImageUrl(item.students),
+          Poster_Image:
+            typeof item.posterImage === "string"
+              ? formatImageUrl(item.posterImage)
+              : "",
+          studentData: Array.isArray(item.students)
+            ? item.students.map((s) => s.name).join(", ")
+            : "",
         })),
       );
 
