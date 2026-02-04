@@ -10,6 +10,7 @@ import "jspdf-autotable";
 import * as XLSX from "xlsx";
 import FileDownloadIcon from "@mui/icons-material/FileDownload"; // Assuming you might want an icon, or just use text
 import Swal from "sweetalert2";
+import { formatImageUrl } from "../../utils/ImageUrlFormat";
 
 export default function AchieversPage() {
   const [activeTab, setActiveTab] = useState("list");
@@ -292,6 +293,8 @@ export default function AchieversPage() {
           Description: item.description,
           EventDate: item.eventDate ? item.eventDate.split("T")[0] : "",
           Status: item.status ? "Active" : "Closed",
+          Poster_Image:formatImageUrl(item.posterImage),
+          studentData:formatImageUrl(item.students),
         })),
       );
 

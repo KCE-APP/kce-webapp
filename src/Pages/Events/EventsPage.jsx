@@ -11,6 +11,7 @@ import jsPDF from "jspdf";
 import "jspdf-autotable";
 import * as XLSX from "xlsx";
 import Swal from "sweetalert2";
+import { formatImageUrl } from "../../utils/ImageUrlFormat";
 
 export default function EventsPage() {
   const [activeTab, setActiveTab] = useState("list");
@@ -160,6 +161,7 @@ export default function EventsPage() {
           Status: item.status ? "Active" : "Inactive",
           Description: item.description,
           Target_Audience: item.targetAudience,
+          Poster_Image:formatImageUrl( item.eventImage)
         })),
       );
       const workbook = XLSX.utils.book_new();
