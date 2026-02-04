@@ -25,6 +25,7 @@ import Logo from "../../assets/logo.png";
 import KCELogo from "../../assets/KCE_LOGO.webp";
 import KITLogo from "../../assets/KIT-LOGO.png";
 import TablePlaceholder from "../../component/TablePlaceholder";
+import SecureImage from "../../component/SecureImage";
 const REACTION_TYPES = [
   {
     id: "clap",
@@ -483,7 +484,7 @@ export default function AchieversTable({
                   onClick={handleCloseModal}
                   style={{ opacity: 1, zIndex: 10 }}
                 ></button>
-                <img
+                <SecureImage
                   src={formatImageUrl(selectedImage)}
                   alt={selectedTitle}
                   className="w-100 d-block"
@@ -587,7 +588,7 @@ export default function AchieversTable({
 
                     <div className="flex-shrink-0 me-3">
                       {student.imageUrl ? (
-                        <img
+                        <SecureImage
                           src={formatImageUrl(student.imageUrl)}
                           alt={student.name}
                           className="rounded-circle object-fit-cover shadow-sm border"

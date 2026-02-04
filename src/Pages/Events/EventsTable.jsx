@@ -14,6 +14,7 @@ import Swal from "sweetalert2";
 
 import TablePlaceholder from "../../component/TablePlaceholder";
 import api from "../../api/axios";
+import SecureImage from "../../component/SecureImage";
 
 export default function EventsTable({
   data,
@@ -500,7 +501,7 @@ export default function EventsTable({
                   onClick={handleCloseModal}
                   style={{ opacity: 1, zIndex: 10 }}
                 ></button>
-                <img
+                <SecureImage
                   src={formatImageUrl(selectedImage)}
                   alt={selectedTitle}
                   className="w-100 d-block"
