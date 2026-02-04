@@ -99,7 +99,9 @@ export default function AchieversPage() {
   const handleSave = async (formData) => {
     try {
       if (editingItem) {
-        await api.put(`/achievers/${editingItem._id}`, formData);
+        await api.put(`/achievers/${editingItem._id}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         Swal.mixin({
           toast: true,
           position: "top-end",
@@ -115,7 +117,9 @@ export default function AchieversPage() {
           title: "Achievement updated successfully!",
         });
       } else {
-        await api.post("/achievers", formData);
+        await api.post("/achievers", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         Swal.mixin({
           toast: true,
           position: "top-end",

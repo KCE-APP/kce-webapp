@@ -707,7 +707,7 @@ function formatImageUrl(url) {
 
   if (!url.startsWith("http") && !url.startsWith("https")) {
     const cleanPath = url.replace(/\\/g, "/");
-    // console.log(`${import.meta.env.VITE_IMAGE_BASE_URL}/${cleanPath}`);
+    console.log(`${import.meta.env.VITE_IMAGE_BASE_URL}/${cleanPath}`);
     return `${import.meta.env.VITE_IMAGE_BASE_URL}/${cleanPath}`;
   }
 

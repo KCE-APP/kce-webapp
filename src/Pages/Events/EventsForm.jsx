@@ -46,6 +46,8 @@ const EventsForm = forwardRef(
               if (key === "eventImage") {
                 if (form[key] instanceof File) {
                   formData.append("eventImage", form[key]);
+                } else if (typeof form[key] === "string" && form[key]) {
+                  formData.append("eventImage", form[key]);
                 }
               } else if (key === "type") {
                 formData.append(
@@ -189,6 +191,8 @@ const EventsForm = forwardRef(
           Object.keys(form).forEach((key) => {
             if (key === "eventImage") {
               if (form[key] instanceof File) {
+                formData.append("eventImage", form[key]);
+              } else if (typeof form[key] === "string" && form[key]) {
                 formData.append("eventImage", form[key]);
               }
             } else if (key === "type") {
