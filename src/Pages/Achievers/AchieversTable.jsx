@@ -265,7 +265,7 @@ export default function AchieversTable({
                 </tr>
               </thead>
               <tbody>
-                {data && data.length > 0 ? (
+                {Array.isArray(data) && data.length > 0 ? (
                   data.map((a) => (
                     <tr key={a._id}>
                       <td className="ps-4">

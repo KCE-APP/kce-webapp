@@ -42,12 +42,16 @@ export default function AchieversPage() {
         },
       });
       // Handle response structure { data: [], totalPages: 5, ... }
-      if (res.data && res.data.data) {
+      // Handle response structure { data: [], totalPages: 5, ... }
+      if (res.data && Array.isArray(res.data.data)) {
         setData(res.data.data);
         setTotalPages(res.data.totalPages || 1);
-      } else {
+      } else if (Array.isArray(res.data)) {
         // Fallback if backend not updated or returns array
         setData(res.data);
+      } else {
+        console.error("Unexpected response data format:", res.data);
+        setData([]); // Set empty array to avoid crash
       }
     } catch (error) {
       console.error("Failed to load data", error);

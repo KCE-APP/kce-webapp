@@ -5,6 +5,7 @@ const api = axios.create({
   headers: {
     "X-App-Client": "kce-admin",
     "Content-Type": "application/json",
+    "ngrok-skip-browser-warning": "true",
   },
 });
 
