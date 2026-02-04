@@ -294,7 +294,7 @@ export default function AchieversPage() {
           EventDate: item.eventDate ? item.eventDate.split("T")[0] : "",
           Status: item.status ? "Active" : "Closed",
           Poster_Image:formatImageUrl(item.posterImage),
-          studentData:formatImageUrl(item.students);
+          studentData:formatImageUrl(item.students),
         })),
       );
 
