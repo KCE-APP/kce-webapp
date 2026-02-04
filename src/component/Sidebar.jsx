@@ -19,7 +19,7 @@ function Sidebar() {
                  <span className="fw-medium">Announcements</span>
             </Nav.Link> */}
             <Nav.Link as={NavLink} to="/api-integration" className="sidebar-link d-flex align-items-center gap-2 px-3 py-2 rounded text-decoration-none">
-                 <span className="fw-medium">Third Party API</span>
+                 <span className="fw-medium">Arena</span>
             </Nav.Link>
         </Nav>
     </div>
