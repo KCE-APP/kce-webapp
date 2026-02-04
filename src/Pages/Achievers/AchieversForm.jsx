@@ -72,6 +72,8 @@ const AchieversForm = forwardRef(
               } else if (key === "posterImage") {
                 if (form[key] instanceof File) {
                   formData.append("posterImage", form[key]);
+                } else if (typeof form[key] === "string" && form[key]) {
+                  formData.append("posterImage", form[key]);
                 } else if (entryType === "manual") {
                   formData.append("posterImage", "null");
                 }
@@ -123,7 +125,10 @@ const AchieversForm = forwardRef(
           eventDate: initialData.eventDate
             ? initialData.eventDate.split("T")[0]
             : "",
-          posterImage: initialData.posterImage || "",
+          posterImage:
+            typeof initialData.posterImage === "string"
+              ? initialData.posterImage
+              : "",
           students: initialData.students
             ? initialData.students.map((s) => ({
                 ...s,
@@ -310,6 +315,8 @@ const AchieversForm = forwardRef(
               });
             } else if (key === "posterImage") {
               if (form[key] instanceof File) {
+                formData.append("posterImage", form[key]);
+              } else if (typeof form[key] === "string" && form[key]) {
                 formData.append("posterImage", form[key]);
               } else if (entryType === "manual") {
                 formData.append("posterImage", "null");

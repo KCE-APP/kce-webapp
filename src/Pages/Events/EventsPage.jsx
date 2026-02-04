@@ -161,7 +161,7 @@ export default function EventsPage() {
           Status: item.status ? "Active" : "Inactive",
           Description: item.description,
           Target_Audience: item.targetAudience,
-          Poster_Image:formatImageUrl( item.eventImage)
+          Poster_Image: formatImageUrl(item.eventImage),
         })),
       );
       const workbook = XLSX.utils.book_new();
@@ -240,7 +240,9 @@ export default function EventsPage() {
   const handleSave = async (formData) => {
     try {
       if (editingItem) {
-        await api.put(`/events/${editingItem._id}`, formData);
+        await api.put(`/events/${editingItem._id}`, formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         Swal.mixin({
           toast: true,
           position: "top-end",
@@ -256,7 +258,9 @@ export default function EventsPage() {
           title: "Event updated successfully!",
         });
       } else {
-        await api.post("/events", formData);
+        await api.post("/events", formData, {
+          headers: { "Content-Type": "multipart/form-data" },
+        });
         Swal.mixin({
           toast: true,
           position: "top-end",
