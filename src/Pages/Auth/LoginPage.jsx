@@ -69,34 +69,51 @@ const LoginPage = () => {
       const response = await api.post("/auth/login", { email, password });
 
       if (response.data.message === "Login successful") {
-        if (response.data.token) {
-          localStorage.setItem("token", response.data.token);
+        const token =
+          response.data.token || response.data.accessToken || response.data.jwt;
+        const user = response.data.user || response.data.userData;
+
+        console.log("Login Response Data:", response.data);
+
+        if (token) {
+          localStorage.setItem("token", token);
+          localStorage.setItem("user", JSON.stringify(user || {}));
+
+          // Optional: Show success alert before redirecting
+          const Toast = Swal.mixin({
+            toast: true,
+            position: "top-end",
+            showConfirmButton: false,
+            timer: 3000,
+            timerProgressBar: true,
+            didOpen: (toast) => {
+              toast.onmouseenter = Swal.stopTimer;
+              toast.onmouseleave = Swal.resumeTimer;
+            },
+          });
+          Toast.fire({
+            icon: "success",
+            title: "Signed in successfully",
+          });
+
+          navigate("/achievers"); // Redirect to dashboard
+        } else {
+          console.error(
+            "Login successful but no token found in response:",
+            response.data,
+          );
+          Swal.fire({
+            icon: "error",
+            title: "Login Error",
+            text: "Server returned success but no authentication token was found. Please check console.",
+            confirmButtonColor: "#f97316",
+          });
         }
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-
-        // Optional: Show success alert before redirecting
-        const Toast = Swal.mixin({
-          toast: true,
-          position: "top-end",
-          showConfirmButton: false,
-          timer: 3000,
-          timerProgressBar: true,
-          didOpen: (toast) => {
-            toast.onmouseenter = Swal.stopTimer;
-            toast.onmouseleave = Swal.resumeTimer;
-          },
-        });
-        Toast.fire({
-          icon: "success",
-          title: "Signed in successfully",
-        });
-
-        navigate("/achievers"); // Redirect to dashboard
       } else {
         Swal.fire({
           icon: "error",
           title: "Login Failed",
-          text: "No token received.",
+          text: response.data.message || "Unknown error",
           confirmButtonColor: "#f97316",
         });
       }
