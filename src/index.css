@@ -8,9 +8,7 @@ body,
 }
 
 body {
-  font-family: "Inter", -apple-system, BlinkMacSystemFont,
-               "San Francisco", "Helvetica Neue",
-               Helvetica, Arial, sans-serif;
+    font-family: 'Poppins', sans-serif;
 
   background-color: #f0f2f5;
   color: #333;
