@@ -334,7 +334,7 @@ export default function AchieversPage() {
       >
         <Nav.Item>
           <Nav.Link eventKey="list" className="px-4">
-            View List
+            View Achievers
           </Nav.Link>
         </Nav.Item>
         <Nav.Item>
