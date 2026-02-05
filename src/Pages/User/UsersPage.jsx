@@ -156,7 +156,7 @@ export default function UsersPage() {
       >
         <Nav.Item>
           <Nav.Link eventKey="list" className="fw-bold px-4">
-            View User
+            View List
           </Nav.Link>
         </Nav.Item>
       </Nav>
