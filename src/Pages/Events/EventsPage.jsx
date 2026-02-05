@@ -34,7 +34,7 @@ export default function EventsPage() {
   const loadEvents = async () => {
     setLoading(true);
     try {
-      const res = await api.get("/events", {
+      const res = await api.get("/events/admin", {
         params: {
           page: currentPage,
           limit: 10,

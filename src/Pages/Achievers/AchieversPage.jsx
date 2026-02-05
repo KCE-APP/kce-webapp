@@ -34,7 +34,7 @@ export default function AchieversPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const res = await api.get("/achievers", {
+      const res = await api.get("/achievers/admin", {
         params: {
           page: currentPage,
           limit: 10,
