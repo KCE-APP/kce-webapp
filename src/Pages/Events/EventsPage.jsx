@@ -346,7 +346,7 @@ export default function EventsPage() {
       >
         <Nav.Item>
           <Nav.Link eventKey="list" className="px-4">
-            View List
+            View Events
           </Nav.Link>
         </Nav.Item>
         <Nav.Item>
