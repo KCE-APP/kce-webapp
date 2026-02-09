@@ -11,11 +11,10 @@ export default function UsersPage() {
   const [loading, setLoading] = useState(true);
   const [editingItem, setEditingItem] = useState(null);
 
-  // Filters and Pagination State
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCollege, setFilterCollege] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1); // Set from backend
+  const [totalPages, setTotalPages] = useState(1); 
   const itemsPerPage = 10;
 
   const loadUsers = async () => {
@@ -171,7 +170,7 @@ export default function UsersPage() {
           searchTerm={searchTerm}
           onSearchChange={(val) => {
             setSearchTerm(val);
-            setCurrentPage(1); // Reset page on search
+            setCurrentPage(1); 
           }}
           filterCollege={filterCollege}
           onFilterChange={(val) => {
