@@ -34,7 +34,7 @@ export default function AchieversPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const res = await api.get("/achievers", {
+      const res = await api.get("/achievers/admin", {
         params: {
           page: currentPage,
           limit: 10,
@@ -334,7 +334,7 @@ export default function AchieversPage() {
       >
         <Nav.Item>
           <Nav.Link eventKey="list" className="px-4">
-            View List
+            View Achievers
           </Nav.Link>
         </Nav.Item>
         <Nav.Item>

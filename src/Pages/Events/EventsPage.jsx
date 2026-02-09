@@ -34,7 +34,7 @@ export default function EventsPage() {
   const loadEvents = async () => {
     setLoading(true);
     try {
-      const res = await api.get("/events", {
+      const res = await api.get("/events/admin", {
         params: {
           page: currentPage,
           limit: 10,
@@ -97,7 +97,6 @@ export default function EventsPage() {
         "Type",
         "Org", // Shortened
         "Status",
-        // "Description", // Exclude description to save space, or truncate heavily
         "Target",
         "Mode",
         "Visibility",
@@ -346,7 +345,7 @@ export default function EventsPage() {
       >
         <Nav.Item>
           <Nav.Link eventKey="list" className="px-4">
-            View List
+            View Events
           </Nav.Link>
         </Nav.Item>
         <Nav.Item>

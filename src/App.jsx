@@ -11,6 +11,8 @@ import "./App.css";
 import LoginPage from "./Pages/Auth/LoginPage";
 import ProtectedRoute from "./component/ProtectedRoute";
 import UnauthorizedPage from "./Pages/Auth/UnauthorizedPage";
+import AchievementMangement from "./Pages/AchieveManager";
+import AchievementDetails from "./Pages/Achievements/AchievementDetails";
 
 function MainLayout() {
   return (
@@ -20,14 +22,21 @@ function MainLayout() {
         <Sidebar />
         <main className="page-content-wrapper">
           <Routes>
-              <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
-            <Route path="/" element={<AchieversPage />} />
-            <Route path="/achievers" element={<AchieversPage />} />
-            <Route path="/events" element={<EventsPage />} />
-            <Route path="/api-integration" element={<APIPage />} />
+            <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+              <Route path="/" element={<AchieversPage />} />
+              <Route path="/achievers" element={<AchieversPage />} />
+              <Route path="/events" element={<EventsPage />} />
+              <Route path="/api-integration" element={<APIPage />} />
+              <Route
+                path="/achieve-management"
+                element={<AchievementMangement />}
+              />
+              <Route
+                path="/achieve-management/:achievementInfo"
+                element={<AchievementDetails />}
+              />
+              {/* Admin Only Route */}
 
-            {/* Admin Only Route */}
-          
               <Route path="/users" element={<UsersPage />} />
             </Route>
           </Routes>
