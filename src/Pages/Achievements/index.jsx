@@ -57,7 +57,7 @@ export default function AchieverBoardContainer() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const itemsPerPage = 3;
+  const itemsPerPage = 10;
 
   const filteredData = useMemo(() => {
     return data.filter(
