@@ -21,17 +21,39 @@ export default function AchieverBoard({
   return (
     <div className="px-4 px-lg-4 py-3">
       {/* Toolbar */}
-      <div className="toolbar-card d-flex flex-column flex-lg-row align-items-center justify-content-between gap-3 mb-4">
-        <div className="position-relative w-50" style={{ maxWidth: "450px" }}>
-          <div className="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
-            <SearchIcon style={{ fontSize: "20px" }} />
-          </div>
+      <div className="d-flex justify-content-center mb-4">
+        <div className="position-relative w-100" style={{ maxWidth: "480px" }}>
+          <SearchIcon
+            style={{
+              position: "absolute",
+              top: "50%",
+              left: "16px",
+              transform: "translateY(-50%)",
+              fontSize: "20px",
+              color: "#f97316",
+              opacity: 0.7,
+            }}
+          />
+
           <Form.Control
             type="text"
             placeholder="Search by student name or roll no"
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="search-input ps-5 py-2"
+            style={{
+              paddingLeft: "45px",
+              paddingTop: "10px",
+              paddingBottom: "10px",
+              borderRadius: "12px",
+              border: "1px solid rgba(249,115,22,0.3)",
+              fontSize: "0.9rem",
+            }}
+            onFocus={(e) =>
+              (e.target.style.boxShadow = "0 0 0 3px rgba(249,115,22,0.25)")
+            }
+            onBlur={(e) =>
+              (e.target.style.boxShadow = "0 2px 10px rgba(249,115,22,0.08)")
+            }
           />
         </div>
       </div>
