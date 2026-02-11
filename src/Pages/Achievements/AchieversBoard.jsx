@@ -67,7 +67,7 @@ export default function AchieverBoard({
                       }
                       style={{ cursor: "pointer" }}
                     >
-                      <td className="ps-4 text-start fw-bold text-dark">
+                      <td className="ps-4 text-center fw-bold text-dark">
                         {student.name}
                       </td>
 
@@ -78,24 +78,80 @@ export default function AchieverBoard({
                       <td>
                         <span
                           style={{
-                            backgroundColor: "#fff4ec",
-                            color: "#f97316",
-                            padding: "4px 12px",
+                            padding: "4px 14px",
                             borderRadius: "20px",
                             fontSize: "0.75rem",
                             fontWeight: 600,
                             display: "inline-flex",
                             alignItems: "center",
-                            gap: "5px",
+                            gap: "6px",
+                            backgroundColor:
+                              student.rewardType === "Certification Completion"
+                                ? "#eef2ff"
+                                : student.rewardType ===
+                                    "Hackathon Participation"
+                                  ? "#f3f4f6"
+                                  : student.rewardType === "Hackathon Winner"
+                                    ? "#fff7ed"
+                                    : student.rewardType ===
+                                        "Competition Finalist"
+                                      ? "#fdf2f8"
+                                      : student.rewardType ===
+                                          "Top Internal Performer"
+                                        ? "#ecfdf5"
+                                        : student.rewardType ===
+                                            "Special Recognition Post"
+                                          ? "#f0f9ff"
+                                          : "#fff4ec",
+                            color:
+                              student.rewardType === "Certification Completion"
+                                ? "#4338ca"
+                                : student.rewardType ===
+                                    "Hackathon Participation"
+                                  ? "#374151"
+                                  : student.rewardType === "Hackathon Winner"
+                                    ? "#ea580c"
+                                    : student.rewardType ===
+                                        "Competition Finalist"
+                                      ? "#be185d"
+                                      : student.rewardType ===
+                                          "Top Internal Performer"
+                                        ? "#047857"
+                                        : student.rewardType ===
+                                            "Special Recognition Post"
+                                          ? "#0369a1"
+                                          : "#f97316",
                           }}
                         >
-                          <EmojiEventsIcon style={{ fontSize: "16px" }} />
+                          <EmojiEventsIcon style={{ fontSize: "15px" }} />
                           {student.rewardType}
                         </span>
                       </td>
 
-                      <td className="small fw-bold text-uppercase text-muted">
-                        {student.status || "Applied"}
+                      <td>
+                        <span
+                          style={{
+                            padding: "4px 14px",
+                            borderRadius: "20px",
+                            fontSize: "0.75rem",
+                            fontWeight: 600,
+                            textTransform: "uppercase",
+                            backgroundColor:
+                              (student.status || "Applied") === "Approved"
+                                ? "#e6f7ee"
+                                : (student.status || "Applied") === "Rejected"
+                                  ? "#fdecec"
+                                  : "#fff4ec",
+                            color:
+                              (student.status || "Applied") === "Approved"
+                                ? "#1e7e34"
+                                : (student.status || "Applied") === "Rejected"
+                                  ? "#d93025"
+                                  : "#f97316",
+                          }}
+                        >
+                          {student.status || "Applied"}
+                        </span>
                       </td>
 
                       <td className="text-end pe-4">

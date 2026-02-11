@@ -6,8 +6,9 @@ const initialData = [
     _id: "1",
     name: "STEVE",
     rollNo: "717822F222",
-    rewardType: "Best Performer",
+    rewardType: "Certification Completion",
     status: "Applied",
+    createdAt: "2026-02-10T16:16:56.335Z",
   },
   {
     _id: "2",
@@ -15,20 +16,39 @@ const initialData = [
     rollNo: "717822F223",
     rewardType: "Hackathon Winner",
     status: "Approved",
+    createdAt: "2026-02-08T11:45:20.120Z",
   },
   {
     _id: "3",
     name: "PRIYA",
     rollNo: "717822F224",
-    rewardType: "Research Excellence",
-    status: "Pending",
+    rewardType: "Competition Finalist",
+    status: "Rejected",
+    createdAt: "2026-02-05T09:22:10.500Z",
   },
   {
     _id: "4",
     name: "RAHUL",
     rollNo: "717822F225",
-    rewardType: "Sports Achievement",
+    rewardType: "Top Internal Performer",
     status: "Applied",
+    createdAt: "2026-02-03T14:30:40.210Z",
+  },
+  {
+    _id: "5",
+    name: "DIVYA",
+    rollNo: "717822F226",
+    rewardType: "Hackathon Participation",
+    status: "Approved",
+    createdAt: "2026-02-01T18:05:15.900Z",
+  },
+  {
+    _id: "6",
+    name: "KARTHIK",
+    rollNo: "717822F227",
+    rewardType: "Special Recognition Post",
+    status: "Applied",
+    createdAt: "2026-01-29T10:12:33.420Z",
   },
 ];
 
@@ -37,7 +57,7 @@ export default function AchieverBoardContainer() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
-  const itemsPerPage = 3;
+  const itemsPerPage = 10;
 
   const filteredData = useMemo(() => {
     return data.filter(
