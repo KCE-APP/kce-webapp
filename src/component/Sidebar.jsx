@@ -64,6 +64,13 @@ function Sidebar() {
           />
           <span className="fw-medium">Arena</span>
         </Nav.Link>
+        <Nav.Link
+          as={NavLink}
+          to="/achieve-management"
+          className="sidebar-link d-flex align-items-center gap-3 px-3 py-2 rounded text-decoration-none"
+        >
+          <span className="fw-medium">Achievement Management</span>
+        </Nav.Link>
       </Nav>
     </div>
   );

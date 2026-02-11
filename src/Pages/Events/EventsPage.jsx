@@ -97,7 +97,6 @@ export default function EventsPage() {
         "Type",
         "Org", // Shortened
         "Status",
-        // "Description", // Exclude description to save space, or truncate heavily
         "Target",
         "Mode",
         "Visibility",
