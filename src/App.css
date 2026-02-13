@@ -46,6 +46,8 @@ nav.navbar {
   transition: all 0.2s ease-in-out;
   border-right: 3px solid transparent; /* Reserve space for active border */
   margin-bottom: 4px;
+  font-size: 0.9rem;
+  font-weight: 600;
 }
 
 .sidebar-link:hover {
