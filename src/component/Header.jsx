@@ -48,31 +48,36 @@ function Header() {
             id="basic-navbar-nav"
             className="justify-content-end"
           >
-            <Dropdown align="end">
+            <Dropdown align="end" className="profile-dropdown">
               <Dropdown.Toggle
-                variant="white"
-                id="dropdown-basic"
-                className="d-flex align-items-center border-0 p-0 shadow-none"
+                variant="link"
+                id="dropdown-user"
+                className="profile-toggle d-flex align-items-center text-decoration-none border-0 p-1"
               >
-                <div className="text-end me-3 d-none d-lg-block">
-                  <div className="fw-bold small">
+                <div className="profile-info text-end me-2 d-none d-md-block">
+                  <div className="profile-name fw-bold text-dark">
                     {user.name || "Admin User"}
                   </div>
-                  <div className="text-muted" style={{ fontSize: "0.75rem" }}>
+                  <div className="profile-email text-muted small">
                     {user.email || "admin@kce.ac.in"}
                   </div>
                 </div>
-                <AccountCircleIcon fontSize="large" className="text-primary" />
+                <div className="avatar-wrapper shadow-sm">
+                  <AccountCircleIcon className="avatar-icon theme-color" />
+                </div>
               </Dropdown.Toggle>
 
-              <Dropdown.Menu
-                className="shadow-sm border-0 mt-2"
-                style={{ borderRadius: "12px", minWidth: "200px" }}
-              >
+              <Dropdown.Menu className="profile-menu shadow-lg border-0 mt-3 pt-0 overflow-hidden">
+                <div className="profile-dropdown-header px-3 py-3 mb-2 bg-light border-bottom">
+                  <div className="fw-bold text-dark">{user.name}</div>
+                  <div className="text-muted small truncate-text">
+                    {user.email}
+                  </div>
+                </div>
 
                 <Dropdown.Item
                   onClick={handleLogout}
-                  className="d-flex align-items-center gap-2 py-2 px-3 text-danger"
+                  className="logout-item d-flex align-items-center gap-2 py-2 px-3 text-danger"
                 >
                   <LogoutIcon fontSize="small" /> Logout
                 </Dropdown.Item>

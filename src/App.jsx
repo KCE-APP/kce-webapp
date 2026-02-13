@@ -8,12 +8,16 @@ import UsersPage from "./Pages/User/UsersPage";
 import APIPage from "./Pages/API";
 import "./App.css";
 
-
 import LoginPage from "./Pages/Auth/LoginPage";
 import ProtectedRoute from "./component/ProtectedRoute";
 import UnauthorizedPage from "./Pages/Auth/UnauthorizedPage";
 import AchievementMangement from "./Pages/AchieveManager";
 import AchievementDetails from "./Pages/Achievements/AchievementDetails";
+import PointRulesPage from "./Pages/PointRules/PointRulesPage";
+import StaffPage from "./Pages/Staff/StaffPage";
+import SemesterPage from "./Pages/Semester/SemesterPage";
+import RewardCatalogPage from "./Pages/Rewards/RewardCatalogPage";
+import RedemptionHistoryPage from "./Pages/Rewards/RedemptionHistoryPage";
 
 function MainLayout() {
   return (
@@ -39,6 +43,14 @@ function MainLayout() {
               {/* Admin Only Route */}
 
               <Route path="/users" element={<UsersPage />} />
+              <Route path="/point-rules" element={<PointRulesPage />} />
+              <Route path="/staff" element={<StaffPage />} />
+              <Route path="/semester" element={<SemesterPage />} />
+              <Route path="/reward-catalog" element={<RewardCatalogPage />} />
+              <Route
+                path="/redemption-history"
+                element={<RedemptionHistoryPage />}
+              />
             </Route>
           </Routes>
         </main>

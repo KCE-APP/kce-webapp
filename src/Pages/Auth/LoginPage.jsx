@@ -4,6 +4,7 @@ import { useNavigate, useLocation } from "react-router-dom";
 import api from "../../api/axios";
 import "./auth.css";
 import Swal from "sweetalert2";
+import KI_LOGO3 from "../../assets/KI_LOGO3.png";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
@@ -66,20 +67,17 @@ const LoginPage = () => {
 
     setLoading(true);
     try {
-      const response = await api.post("/auth/login", { email, password });
+      const response = await api.post("/auth/staff-login", { email, password });
 
-      if (response.data.message === "Login successful") {
-        const token =
-          response.data.token || response.data.accessToken || response.data.jwt;
-        const user = response.data.user || response.data.userData;
+      if (response.data.success) {
+        const { token, staff } = response.data;
 
         console.log("Login Response Data:", response.data);
 
         if (token) {
           localStorage.setItem("token", token);
-          localStorage.setItem("user", JSON.stringify(user || {}));
+          localStorage.setItem("user", JSON.stringify(staff || {}));
 
-          // Optional: Show success alert before redirecting
           const Toast = Swal.mixin({
             toast: true,
             position: "top-end",
@@ -96,7 +94,7 @@ const LoginPage = () => {
             title: "Signed in successfully",
           });
 
-          navigate("/achievers"); // Redirect to dashboard
+          navigate("/achievers");
         } else {
           console.error(
             "Login successful but no token found in response:",
@@ -149,24 +147,21 @@ const LoginPage = () => {
               <div className="mb-4">
                 <div
                   style={{
-                    background: "rgba(249, 115, 22, 0.1)",
-                    padding: "12px",
-                    borderRadius: "12px",
+                    background: "rgba(243, 238, 235, 0.05)",
+                    padding: "16px",
+                    borderRadius: "16px",
                     display: "inline-block",
                   }}
                 >
-                  <svg
-                    width="40"
-                    height="40"
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="#f97316"
-                    strokeWidth="2"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                  >
-                    <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
-                  </svg>
+                  <img
+                    src={KI_LOGO3}
+                    alt="KCE Logo"
+                    style={{
+                      height: "60px",
+                      width: "auto",
+                      display: "block",
+                    }}
+                  />
                 </div>
               </div>
               <h3 className="login-title">Welcome Back</h3>
@@ -226,17 +221,17 @@ const LoginPage = () => {
             </Form>
 
             {/* Optional: Forgot password link */}
-            <div className="text-center">
+            {/* <div className="text-center">
               <a href="#" className="forgot-password-link">
                 Forgot password?
               </a>
-            </div>
+            </div> */}
           </Card.Body>
         </Card>
 
         <div className="text-center mt-4">
           <p className="login-footer">
-            &copy; {new Date().getFullYear()} KCE Spot Admin. All rights
+            &copy; {new Date().getFullYear()} KCE SpotLight Admin. All rights
             reserved.
           </p>
         </div>
