@@ -1,11 +1,11 @@
 import { useEffect, useState, useRef } from "react";
 import { Container, Nav, Modal, Button } from "react-bootstrap";
 import api from "../../api/axios";
-import StaffTable from "./StaffTable";
-import StaffForm from "./StaffForm";
+import RewardCatalogTable from "./RewardCatalogTable";
+import RewardCatalogForm from "./RewardCatalogForm";
 import Swal from "sweetalert2";
 
-export default function StaffPage() {
+export default function RewardCatalogPage() {
   const [activeTab, setActiveTab] = useState("list");
   const [data, setData] = useState([]);
   const [editingItem, setEditingItem] = useState(null);
@@ -14,7 +14,6 @@ export default function StaffPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
-  const [filterCollege, setFilterCollege] = useState("");
   const [limit, setLimit] = useState(10);
 
   // Dirty State Logic
@@ -28,12 +27,11 @@ export default function StaffPage() {
   const loadData = async () => {
     setLoading(true);
     try {
-      const res = await api.get("/staff", {
+      const res = await api.get("/rewards/catalog", {
         params: {
           page: currentPage,
           limit: limit,
           search: searchTerm,
-          collegeName: filterCollege,
         },
       });
 
@@ -47,7 +45,7 @@ export default function StaffPage() {
         setData([]);
       }
     } catch (error) {
-      console.error("Failed to load staff data", error);
+      console.error("Failed to load reward catalog", error);
     } finally {
       setLoading(false);
     }
@@ -59,7 +57,7 @@ export default function StaffPage() {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [currentPage, searchTerm, filterCollege, limit]);
+  }, [currentPage, searchTerm, limit]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -67,11 +65,6 @@ export default function StaffPage() {
 
   const handleSearchChange = (term) => {
     setSearchTerm(term);
-    setCurrentPage(1);
-  };
-
-  const handleFilterChange = (college) => {
-    setFilterCollege(college);
     setCurrentPage(1);
   };
 
@@ -83,11 +76,11 @@ export default function StaffPage() {
   const handleExport = async () => {
     try {
       const baseUrl = import.meta.env.VITE_API_BASE_URL;
-      const exportUrl = `${baseUrl}/staff/export?search=${searchTerm}&collegeName=${filterCollege}`;
+      const exportUrl = `${baseUrl}/rewards/export/catalog?search=${searchTerm}`;
       window.open(exportUrl, "_blank");
     } catch (error) {
       console.error("Export failed", error);
-      Swal.fire("Error", "Failed to export staff data", "error");
+      Swal.fire("Error", "Failed to export reward catalog", "error");
     }
   };
 
@@ -105,37 +98,20 @@ export default function StaffPage() {
   const handleSave = async (payload) => {
     try {
       if (editingItem) {
-        // Construct refined payload as per user's curl example
-        const updatePayload = {
-          name: payload.name,
-          role: payload.role,
-          department: payload.department,
-          collegeName: payload.collegeName,
-        };
-
-        // If password was changed (not the mask), include it
-        if (
-          payload.password &&
-          payload.password.trim() !== "" &&
-          payload.password !== "*********"
-        ) {
-          updatePayload.password = payload.password;
-        }
-
-        await api.patch(`/staff/${editingItem._id}`, updatePayload);
+        await api.patch(`/rewards/catalog/${editingItem._id}`, payload);
         Swal.fire({
           icon: "success",
-          title: "Staff details updated successfully!",
+          title: "Reward updated successfully!",
           toast: true,
           position: "top-end",
           timer: 3000,
           showConfirmButton: false,
         });
       } else {
-        await api.post("/staff", payload);
+        await api.post("/rewards/catalog", payload);
         Swal.fire({
           icon: "success",
-          title: "New staff added successfully!",
+          title: "New reward added successfully!",
           toast: true,
           position: "top-end",
           timer: 3000,
@@ -147,8 +123,8 @@ export default function StaffPage() {
       setEditingItem(null);
       loadData();
     } catch (error) {
-      console.error("Failed to save staff information", error);
-      Swal.fire("Error", "Failed to save staff information", "error");
+      console.error("Failed to save reward", error);
+      Swal.fire("Error", "Failed to save reward", "error");
     }
   };
 
@@ -159,18 +135,18 @@ export default function StaffPage() {
 
   const handleDelete = async (id) => {
     try {
-      await api.delete(`/staff/${id}`);
+      await api.delete(`/rewards/catalog/${id}`);
       loadData();
       Swal.fire({
         icon: "success",
-        title: "Staff record has been deleted.",
+        title: "Reward has been deleted.",
         toast: true,
         position: "top-end",
         timer: 3000,
         showConfirmButton: false,
       });
     } catch (err) {
-      Swal.fire("Error", "Failed to delete record", "error");
+      Swal.fire("Error", "Failed to delete reward", "error");
     }
   };
 
@@ -217,9 +193,9 @@ export default function StaffPage() {
     <Container className="py-4">
       <div className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
         <div>
-          <h2 className="fw-bold color2 mb-0">Staff Management</h2>
+          <h2 className="fw-bold color2 mb-0">Reward Catalog</h2>
           <p className="text-muted small mb-0">
-            Register and manage campus staff and instructors
+            Manage your store rewards and merchandise
           </p>
         </div>
       </div>
@@ -232,18 +208,18 @@ export default function StaffPage() {
       >
         <Nav.Item>
           <Nav.Link eventKey="list" className="px-4">
-            View Staff
+            View Catalog
           </Nav.Link>
         </Nav.Item>
         <Nav.Item>
           <Nav.Link eventKey="form" className="px-4">
-            {editingItem ? "Edit Staff" : "Add New"}
+            {editingItem ? "Edit Reward" : "Add New"}
           </Nav.Link>
         </Nav.Item>
       </Nav>
 
       {activeTab === "list" && (
-        <StaffTable
+        <RewardCatalogTable
           data={data}
           loading={loading}
           onEdit={handleEdit}
@@ -253,8 +229,6 @@ export default function StaffPage() {
           onPageChange={handlePageChange}
           searchTerm={searchTerm}
           onSearchChange={handleSearchChange}
-          filterCollege={filterCollege}
-          onFilterChange={handleFilterChange}
           limit={limit}
           onLimitChange={handleLimitChange}
           onExport={handleExport}
@@ -262,7 +236,7 @@ export default function StaffPage() {
       )}
 
       {activeTab === "form" && (
-        <StaffForm
+        <RewardCatalogForm
           ref={formRef}
           initialData={editingItem}
           onSave={handleSave}

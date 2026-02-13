@@ -1,18 +1,16 @@
-import { Table, Button, Form, Pagination } from "react-bootstrap";
+import { Table, Form, Pagination } from "react-bootstrap";
 import EditIcon from "@mui/icons-material/EditOutlined";
 import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import SearchIcon from "@mui/icons-material/Search";
+import StarsIcon from "@mui/icons-material/Stars";
+import InventoryIcon from "@mui/icons-material/Inventory";
 import FileDownloadIcon from "@mui/icons-material/FileDownloadOutlined";
+import CategoryIcon from "@mui/icons-material/Category";
 import { Tooltip } from "@mui/material";
 import Swal from "sweetalert2";
 import TablePlaceholder from "../../component/TablePlaceholder";
-import StarsIcon from "@mui/icons-material/Stars";
-import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
-import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
-import LocalActivityIcon from "@mui/icons-material/LocalActivity";
-import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
-export default function PointRulesTable({
+export default function RewardCatalogTable({
   data,
   loading,
   onEdit,
@@ -26,10 +24,10 @@ export default function PointRulesTable({
   onLimitChange,
   onExport,
 }) {
-  const handleDeleteClick = (id, category) => {
+  const handleDeleteClick = (id, name) => {
     Swal.fire({
       title: "Confirm Delete",
-      text: `Are you sure you want to delete the point rule for "${category}"?`,
+      text: `Are you sure you want to delete "${name}" from the catalog?`,
       icon: "warning",
       showCancelButton: true,
       confirmButtonColor: "#d33",
@@ -47,19 +45,6 @@ export default function PointRulesTable({
     });
   };
 
-  const getCategoryIcon = (category) => {
-    const cat = category.toLowerCase();
-    if (cat.includes("winner") || cat.includes("1st") || cat.includes("first"))
-      return <EmojiEventsIcon sx={{ color: "#f59e0b", fontSize: 20 }} />;
-    if (cat.includes("certification") || cat.includes("course"))
-      return <WorkspacePremiumIcon sx={{ color: "#3b82f6", fontSize: 20 }} />;
-    if (cat.includes("runner") || cat.includes("participation"))
-      return <StarsIcon sx={{ color: "#10b981", fontSize: 20 }} />;
-    if (cat.includes("competition") || cat.includes("event"))
-      return <LocalActivityIcon sx={{ color: "#8b5cf6", fontSize: 20 }} />;
-    return <MoreHorizIcon sx={{ color: "#64748b", fontSize: 20 }} />;
-  };
-
   return (
     <>
       <div className="toolbar-card mb-3">
@@ -69,7 +54,7 @@ export default function PointRulesTable({
           </div>
           <Form.Control
             type="text"
-            placeholder="Search by category..."
+            placeholder="Search by name, category..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
             className="search-input ps-5"
@@ -111,11 +96,15 @@ export default function PointRulesTable({
             <Table className="custom-table mb-0 align-middle">
               <thead>
                 <tr>
-                  <th className="ps-4" style={{ width: "55%" }}>
-                    Category Name
+                  <th className="ps-4" style={{ width: "35%" }}>
+                    Reward Item
                   </th>
-                  <th className="text-center" style={{ width: "30%" }}>
-                    Reward Value
+                  <th style={{ width: "20%" }}>Category</th>
+                  <th className="text-center" style={{ width: "15%" }}>
+                    Cost
+                  </th>
+                  <th className="text-center" style={{ width: "15%" }}>
+                    Stock
                   </th>
                   <th className="text-end pe-4" style={{ width: "15%" }}>
                     Actions
@@ -124,44 +113,57 @@ export default function PointRulesTable({
               </thead>
               <tbody>
                 {Array.isArray(data) && data.length > 0 ? (
-                  data.map((rule) => (
-                    <tr key={rule._id} className="align-middle">
+                  data.map((reward) => (
+                    <tr key={reward._id} className="align-middle">
                       <td className="ps-4 py-3">
                         <div className="d-flex align-items-center gap-3">
                           <div
-                            className="p-2 rounded-circle bg-light d-flex align-items-center justify-content-center"
+                            className="p-2 rounded bg-light d-flex align-items-center justify-content-center"
                             style={{ width: "40px", height: "40px" }}
                           >
-                            {getCategoryIcon(rule.category)}
+                            <InventoryIcon
+                              sx={{ color: "#f3773a", fontSize: 20 }}
+                            />
                           </div>
-                          <div>
-                            <div className="fw-bold text-dark mb-0">
-                              {rule.category}
-                            </div>
-                          </div>
+                          <div className="fw-bold text-dark">{reward.name}</div>
                         </div>
                       </td>
-                      <td className="text-center py-3">
+                      <td>
+                        <div className="d-flex align-items-center gap-2 text-muted small fw-bold">
+                          <CategoryIcon style={{ fontSize: "14px" }} />
+                          {reward.category}
+                        </div>
+                      </td>
+                      <td className="text-center">
                         <span
-                          className="modern-badge d-inline-flex align-items-center gap-2 px-3 py-2"
+                          className="modern-badge d-inline-flex align-items-center gap-2 px-3 py-1"
                           style={{
                             backgroundColor: "#fff7ed",
                             color: "#c2410c",
                             border: "1px solid #ffedd5",
-                            borderRadius: "30px",
+                            borderRadius: "20px",
                             fontWeight: "700",
+                            fontSize: "0.8rem",
                           }}
                         >
-                          <StarsIcon style={{ fontSize: "16px" }} />
-                          {rule.points} Points
+                          <StarsIcon style={{ fontSize: "14px" }} />
+                          {reward.pointsCost}
                         </span>
                       </td>
-                      <td className="pe-4 text-end py-3">
+                      <td className="text-center">
+                        <span
+                          className={`fw-bold ${reward.stock < 5 ? "text-danger" : "text-success"}`}
+                          style={{ fontSize: "0.9rem" }}
+                        >
+                          {reward.stock} Units
+                        </span>
+                      </td>
+                      <td className="pe-4 text-end">
                         <div className="d-flex justify-content-end gap-1">
                           <Tooltip title="Edit">
                             <button
                               className="action-btn edit text-primary"
-                              onClick={() => onEdit(rule)}
+                              onClick={() => onEdit(reward)}
                             >
                               <EditIcon fontSize="small" />
                             </button>
@@ -170,7 +172,7 @@ export default function PointRulesTable({
                             <button
                               className="action-btn delete text-danger"
                               onClick={() =>
-                                handleDeleteClick(rule._id, rule.category)
+                                handleDeleteClick(reward._id, reward.name)
                               }
                             >
                               <DeleteIcon fontSize="small" />
@@ -182,13 +184,13 @@ export default function PointRulesTable({
                   ))
                 ) : (
                   <tr>
-                    <td colSpan="3" className="text-center py-5">
-                      <div className="d-flex flex-column align-items-center justify-content-center p-4">
+                    <td colSpan="5" className="text-center py-5">
+                      <div className="d-flex flex-column align-items-center">
                         <h6 className="text-secondary fw-bold mb-1">
-                          No point rules found
+                          No rewards found
                         </h6>
-                        <p className="text-muted small mb-0">
-                          Try adjusting your search.
+                        <p className="text-muted small">
+                          Try adjusting your search criteria.
                         </p>
                       </div>
                     </td>
@@ -200,7 +202,7 @@ export default function PointRulesTable({
 
           {totalPages > 1 && (
             <div className="d-flex justify-content-center mt-4">
-              <Pagination className="shadow-sm">
+              <Pagination>
                 <Pagination.Prev
                   onClick={() => onPageChange(currentPage - 1)}
                   disabled={currentPage === 1}

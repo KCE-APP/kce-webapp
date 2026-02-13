@@ -14,8 +14,8 @@ export default function UsersPage() {
   const [searchTerm, setSearchTerm] = useState("");
   const [filterCollege, setFilterCollege] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1); 
-  const itemsPerPage = 10;
+  const [totalPages, setTotalPages] = useState(1);
+  const [limit, setLimit] = useState(10);
 
   const loadUsers = async () => {
     setLoading(true);
@@ -23,7 +23,7 @@ export default function UsersPage() {
       const res = await api.get("/users", {
         params: {
           page: currentPage,
-          limit: itemsPerPage,
+          limit: limit,
           search: searchTerm,
           college: filterCollege,
         },
@@ -43,7 +43,7 @@ export default function UsersPage() {
       loadUsers();
     }, 500);
     return () => clearTimeout(timer);
-  }, [currentPage, searchTerm, filterCollege]);
+  }, [currentPage, searchTerm, filterCollege, limit]);
 
   const handleEdit = (user) => {
     setEditingItem(user);
@@ -135,6 +135,14 @@ export default function UsersPage() {
     setEditingItem(null);
   };
 
+  const handleExport = () => {
+    const baseUrl = import.meta.env.VITE_API_BASE_URL;
+    window.open(
+      `${baseUrl}/users/export?search=${searchTerm}&college=${filterCollege}`,
+      "_blank",
+    );
+  };
+
   return (
     <Container className="py-4">
       <div className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
@@ -170,7 +178,7 @@ export default function UsersPage() {
           searchTerm={searchTerm}
           onSearchChange={(val) => {
             setSearchTerm(val);
-            setCurrentPage(1); 
+            setCurrentPage(1);
           }}
           filterCollege={filterCollege}
           onFilterChange={(val) => {
@@ -180,6 +188,12 @@ export default function UsersPage() {
           currentPage={currentPage}
           totalPages={totalPages}
           onPageChange={setCurrentPage}
+          limit={limit}
+          onLimitChange={(v) => {
+            setLimit(Number(v));
+            setCurrentPage(1);
+          }}
+          onExport={handleExport}
         />
       )}
 
