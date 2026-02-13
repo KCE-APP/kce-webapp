@@ -14,6 +14,7 @@ export default function PointRulesPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [limit, setLimit] = useState(10);
 
   // Dirty State Logic
   const [isDirty, setIsDirty] = useState(false);
@@ -29,7 +30,7 @@ export default function PointRulesPage() {
       const res = await api.get("/rewards/rules", {
         params: {
           page: currentPage,
-          limit: 10,
+          limit: limit,
           search: searchTerm,
         },
       });
@@ -56,7 +57,7 @@ export default function PointRulesPage() {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [currentPage, searchTerm]);
+  }, [currentPage, searchTerm, limit]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -65,6 +66,22 @@ export default function PointRulesPage() {
   const handleSearchChange = (term) => {
     setSearchTerm(term);
     setCurrentPage(1);
+  };
+
+  const handleLimitChange = (newLimit) => {
+    setLimit(Number(newLimit));
+    setCurrentPage(1);
+  };
+
+  const handleExport = async () => {
+    try {
+      const baseUrl = import.meta.env.VITE_API_BASE_URL;
+      const exportUrl = `${baseUrl}/rewards/export/rules?search=${searchTerm}`;
+      window.open(exportUrl, "_blank");
+    } catch (error) {
+      console.error("Export failed", error);
+      Swal.fire("Error", "Failed to export point rules", "error");
+    }
   };
 
   useEffect(() => {
@@ -81,7 +98,12 @@ export default function PointRulesPage() {
   const handleSave = async (formData) => {
     try {
       if (editingItem) {
-        await api.patch(`/rewards/rules/${editingItem._id}`, formData);
+        // Refine payload for PATCH as per user sample
+        const updatePayload = {
+          points: Number(formData.points),
+          category: formData.category,
+        };
+        await api.patch(`/rewards/rules/${editingItem._id}`, updatePayload);
         Swal.fire({
           icon: "success",
           title: "Point rule updated successfully!",
@@ -212,6 +234,9 @@ export default function PointRulesPage() {
           onPageChange={handlePageChange}
           searchTerm={searchTerm}
           onSearchChange={handleSearchChange}
+          limit={limit}
+          onLimitChange={handleLimitChange}
+          onExport={handleExport}
         />
       )}
 

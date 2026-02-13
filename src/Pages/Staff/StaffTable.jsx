@@ -2,6 +2,7 @@ import { Table, Form, Pagination } from "react-bootstrap";
 import EditIcon from "@mui/icons-material/EditOutlined";
 import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import SearchIcon from "@mui/icons-material/Search";
+import FileDownloadIcon from "@mui/icons-material/FileDownloadOutlined";
 import { Tooltip } from "@mui/material";
 import Swal from "sweetalert2";
 import TablePlaceholder from "../../component/TablePlaceholder";
@@ -18,6 +19,9 @@ export default function StaffTable({
   onSearchChange,
   filterCollege,
   onFilterChange,
+  limit,
+  onLimitChange,
+  onExport,
 }) {
   const handleDeleteClick = (id, name) => {
     Swal.fire({
@@ -42,38 +46,61 @@ export default function StaffTable({
 
   return (
     <>
-      <div className="toolbar-card d-flex flex-column flex-lg-row align-items-center justify-content-between gap-3 mb-3">
-        <div className="position-relative w-100" style={{ maxWidth: "450px" }}>
+      <div className="toolbar-card mb-3">
+        <div className="position-relative" style={{ width: "320px" }}>
           <div className="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
-            <SearchIcon style={{ fontSize: "20px" }} />
+            <SearchIcon style={{ fontSize: "18px" }} />
           </div>
           <Form.Control
             type="text"
-            placeholder="Search by name or email"
+            placeholder="Search by name or email..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
-            className="search-input ps-5 py-2"
+            className="search-input ps-5"
           />
         </div>
 
-        <div className="d-flex align-items-center gap-2">
-          <span
-            className="text-muted small fw-bold d-none d-md-block"
-            style={{ fontSize: "0.75rem", letterSpacing: "0.05em" }}
+        <div className="ms-auto d-flex align-items-center gap-3">
+          <div className="d-flex align-items-center gap-2">
+            <span className="toolbar-label">CAMPUS:</span>
+            <Form.Select
+              value={filterCollege}
+              onChange={(e) => onFilterChange(e.target.value)}
+              className="filter-select"
+              style={{ width: "auto", minWidth: "150px" }}
+            >
+              <option value="">All Campuses</option>
+              <option value="KCE">KCE</option>
+              <option value="KIT">KIT</option>
+              <option value="KAHE">KAHE</option>
+            </Form.Select>
+          </div>
+
+          <div className="toolbar-separator"></div>
+
+          <div className="d-flex align-items-center gap-2">
+            <span className="toolbar-label">LIMIT:</span>
+            <Form.Select
+              value={limit}
+              onChange={(e) => onLimitChange(e.target.value)}
+              className="filter-select"
+              style={{ width: "auto", minWidth: "80px" }}
+            >
+              <option value="10">10</option>
+              <option value="25">25</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+            </Form.Select>
+          </div>
+
+          <button
+            onClick={onExport}
+            className="export-btn export-btn-excel"
+            title="Export to Excel"
           >
-            COLLEGE:
-          </span>
-          <Form.Select
-            value={filterCollege}
-            onChange={(e) => onFilterChange(e.target.value)}
-            className="filter-select py-2 ps-3 pe-5"
-            style={{ width: "auto", minWidth: "140px" }}
-          >
-            <option value="">All Campuses</option>
-            <option value="KCE">KCE</option>
-            <option value="KIT">KIT</option>
-            <option value="KAHE">KAHE</option>
-          </Form.Select>
+            <FileDownloadIcon style={{ fontSize: "18px" }} />
+            <span>Excel</span>
+          </button>
         </div>
       </div>
 

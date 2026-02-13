@@ -11,6 +11,8 @@ function Sidebar() {
     rules: "https://cdn-icons-png.flaticon.com/512/1055/1055644.png",
     staff: "https://cdn-icons-png.flaticon.com/512/912/912318.png",
     semester: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png",
+    catalog: "https://cdn-icons-png.flaticon.com/512/3081/3081648.png",
+    history: "https://cdn-icons-png.flaticon.com/512/3503/3503786.png",
     verfication: "https://cdn-icons-png.flaticon.com/512/9521/9521251.png",
   };
 
@@ -103,6 +105,30 @@ function Sidebar() {
             style={{ width: "24px", height: "24px", objectFit: "contain" }}
           />
           <span className="fw-medium">Manage Semester</span>
+        </Nav.Link>
+        <Nav.Link
+          as={NavLink}
+          to="/reward-catalog"
+          className="sidebar-link d-flex align-items-center gap-3 px-3 py-2 rounded text-decoration-none"
+        >
+          <img
+            src={icons.catalog}
+            alt="icon"
+            style={{ width: "24px", height: "24px", objectFit: "contain" }}
+          />
+          <span className="fw-medium">Reward Catalog</span>
+        </Nav.Link>
+        <Nav.Link
+          as={NavLink}
+          to="/redemption-history"
+          className="sidebar-link d-flex align-items-center gap-3 px-3 py-2 rounded text-decoration-none"
+        >
+          <img
+            src={icons.history}
+            alt="icon"
+            style={{ width: "24px", height: "24px", objectFit: "contain" }}
+          />
+          <span className="fw-medium">Redemption History</span>
         </Nav.Link>
         <Nav.Link
           as={NavLink}
