@@ -243,7 +243,6 @@ export default function AchievementDetails() {
               width: "420px",
               textAlign: "center",
               boxShadow: "0 30px 60px rgba(0,0,0,0.15)",
-              animation: "fadeIn 0.2s ease-out",
             }}
           >
             <h3
@@ -272,11 +271,7 @@ export default function AchievementDetails() {
             </p>
 
             <div
-              style={{
-                display: "flex",
-                justifyContent: "center",
-                gap: "18px",
-              }}
+              style={{ display: "flex", justifyContent: "center", gap: "18px" }}
             >
               <button
                 onClick={closeModal}
@@ -288,7 +283,6 @@ export default function AchievementDetails() {
                   fontWeight: 600,
                   fontSize: "14px",
                   cursor: "pointer",
-                  transition: "all 0.2s ease",
                 }}
               >
                 Cancel
@@ -310,7 +304,6 @@ export default function AchievementDetails() {
                     actionType === "accept"
                       ? "0 6px 20px rgba(249,115,22,0.35)"
                       : "0 6px 20px rgba(217,48,37,0.35)",
-                  transition: "all 0.2s ease",
                 }}
               >
                 Confirm
