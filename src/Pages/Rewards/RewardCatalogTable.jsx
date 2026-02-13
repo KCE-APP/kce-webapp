@@ -118,12 +118,24 @@ export default function RewardCatalogTable({
                       <td className="ps-4 py-3">
                         <div className="d-flex align-items-center gap-3">
                           <div
-                            className="p-2 rounded bg-light d-flex align-items-center justify-content-center"
+                            className="p-1 rounded bg-light d-flex align-items-center justify-content-center overflow-hidden"
                             style={{ width: "40px", height: "40px" }}
                           >
-                            <InventoryIcon
-                              sx={{ color: "#f3773a", fontSize: 20 }}
-                            />
+                            {reward.imageUrl ? (
+                              <img
+                                src={
+                                  reward.imageUrl.startsWith("http")
+                                    ? reward.imageUrl
+                                    : `${import.meta.env.VITE_IMAGE_BASE_URL || ""}/${reward.imageUrl.replace(/\\/g, "/")}`
+                                }
+                                alt={reward.name}
+                                className="w-100 h-100 object-fit-cover"
+                              />
+                            ) : (
+                              <InventoryIcon
+                                sx={{ color: "#f3773a", fontSize: 20 }}
+                              />
+                            )}
                           </div>
                           <div className="fw-bold text-dark">{reward.name}</div>
                         </div>
