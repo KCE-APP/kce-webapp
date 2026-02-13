@@ -5,6 +5,7 @@ import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import SearchIcon from "@mui/icons-material/Search";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEventsOutlined";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import AchieverBoardPlaceholder from "../../component/AchieversListTablePlaceholder";
 
 export default function AchieverBoard({
   data,
@@ -67,7 +68,7 @@ export default function AchieverBoard({
       </div>
 
       {loading ? (
-        <div className="text-center py-5">Loading...</div>
+        <AchieverBoardPlaceholder />
       ) : (
         <>
           <div className="modern-card table-responsive">

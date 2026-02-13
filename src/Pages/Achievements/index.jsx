@@ -1,28 +1,10 @@
-import React, { useState, useMemo, useEffect } from "react";
+import React, { useState, useMemo, useEffect, useCallback } from "react";
 import AchieverBoard from "./AchieversBoard";
 import api from "../../api/axios";
 
 export default function AchieverBoardContainer() {
-  useEffect(() => {
-    fetchSubmission();
-  }, []);
-
-  const fetchSubmission = async () => {
-    try {
-      await api
-        .get("/rewards/submissions")
-        .then((res) => setData(res.data.data))
-        .catch((err) => {
-          setData([]);
-          console.log(err);
-        });
-      console.log(data);
-    } catch (error) {
-      console.log(error);
-    }
-  };
-
   const [data, setData] = useState([]);
+  const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
 
