@@ -187,54 +187,82 @@
 .toolbar-card {
   background: white;
   border-radius: 12px;
-  padding: 16px 20px;
-  border: 1px solid #e2e8f0;
+  padding: 12px 20px;
+  border: 1px solid #f1f5f9;
   margin-bottom: 24px;
-  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.03);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.02);
+  display: flex !important;
+  flex-direction: row !important;
+  align-items: center !important;
+  justify-content: flex-start !important;
+  gap: 16px !important;
+}
+
+.toolbar-label {
+  font-size: 0.7rem;
+  font-weight: 800;
+  color: #64748b;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  white-space: nowrap;
+}
+
+.toolbar-separator {
+  width: 1px;
+  height: 24px;
+  background-color: #e2e8f0;
+  margin: 0 4px;
 }
 
 .search-input {
   background-color: #f8fafc;
   border: 1px solid #e2e8f0;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
+  border-radius: 8px;
   transition: all 0.2s;
+  height: 40px;
 }
 
 .search-input:focus {
   background-color: white;
-  border-color: #cbd5e1;
-  box-shadow: 0 0 0 3px rgba(226, 232, 240, 0.5);
+  border-color: #3b82f6;
+  box-shadow: 0 0 0 3px rgba(59, 130, 246, 0.1);
 }
 
 .filter-select {
   background-color: #f8fafc;
   border: 1px solid #e2e8f0;
-  font-size: 0.9rem;
+  font-size: 0.85rem;
   font-weight: 500;
-  color: #475569;
+  color: #334155;
   cursor: pointer;
+  border-radius: 8px;
+  height: 40px;
+  padding-right: 32px !important;
 }
 
 .export-btn {
   font-size: 0.85rem;
-  font-weight: 600;
+  font-weight: 700;
   padding: 8px 16px;
   border-radius: 8px;
   display: inline-flex;
   align-items: center;
   gap: 8px;
   transition: all 0.2s;
+  height: 40px;
 }
 
 .export-btn-excel {
-  background-color: #f0fdf4;
-  color: #166534;
-  border: 1px solid #dcfce7;
+  background-color: #ecfdf5;
+  color: #059669;
+  border: 1px solid transparent;
 }
 
 .export-btn-excel:hover {
-  background-color: #dcfce7;
-  color: #14532d;
+  background-color: #d1fae5;
+  color: #047857;
+  transform: translateY(-1px);
 }
 
 .export-btn-pdf {

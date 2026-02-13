@@ -1,52 +1,59 @@
-import React, { useState } from "react";
-import { Table, Badge, Button, Form, Pagination } from "react-bootstrap";
+import { Table, Form, Pagination } from "react-bootstrap";
 import EditIcon from "@mui/icons-material/EditOutlined";
 import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import SearchIcon from "@mui/icons-material/Search";
 import FileDownloadIcon from "@mui/icons-material/FileDownloadOutlined";
-import FilterListIcon from "@mui/icons-material/FilterList";
+import { Tooltip } from "@mui/material";
+import Swal from "sweetalert2";
 import TablePlaceholder from "../../component/TablePlaceholder";
 
-export default function UsersTable({
+export default function StaffTable({
   data,
   loading,
   onEdit,
   onDelete,
-  onStatusToggle,
   currentPage,
   totalPages,
+  onPageChange,
+  searchTerm,
+  onSearchChange,
+  filterCollege,
   onFilterChange,
   limit,
   onLimitChange,
   onExport,
-  searchTerm,
-  onSearchChange,
-  filterCollege,
-  onPageChange,
 }) {
-  const getBadgeClassOfCollege = (college) => {
-    switch (college) {
-      case "KCE":
-        return "badge-college-kce";
-      case "KIT":
-        return "badge-college-kit";
-      case "KAHE":
-        return "badge-college-kahe";
-      default:
-        return "badge-category";
-    }
+  const handleDeleteClick = (id, name) => {
+    Swal.fire({
+      title: "Confirm Delete",
+      text: `Are you sure you want to delete the staff record for "${name}"?`,
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonColor: "#d33",
+      cancelButtonColor: "#3085d6",
+      confirmButtonText: "Delete",
+      showLoaderOnConfirm: true,
+      preConfirm: async () => {
+        try {
+          await onDelete(id);
+        } catch (error) {
+          Swal.showValidationMessage(`Request failed: ${error}`);
+        }
+      },
+      allowOutsideClick: () => !Swal.isLoading(),
+    });
   };
 
   return (
     <>
-      <div className="toolbar-card mb-4">
+      <div className="toolbar-card mb-3">
         <div className="position-relative" style={{ width: "320px" }}>
           <div className="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
             <SearchIcon style={{ fontSize: "18px" }} />
           </div>
           <Form.Control
             type="text"
-            placeholder="Search by name, email..."
+            placeholder="Search by name or email..."
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
             className="search-input ps-5"
@@ -102,98 +109,83 @@ export default function UsersTable({
       ) : (
         <>
           <div className="modern-card table-responsive">
-            <Table className="custom-table mb-0 align-middle text-center">
+            <Table className="custom-table mb-0 align-middle">
               <thead>
                 <tr>
-                  <th className="ps-4" style={{ width: "15%" }}>
-                    User Details
-                  </th>
-                  <th style={{ width: "15%" }}>Roll No</th>
-                  <th style={{ width: "20%" }}>Email</th>
-                  <th style={{ width: "20%" }}>College</th>
-
-                  <th style={{ width: "10%" }}>Role</th>
-
-                  {/* <th className="text-end pe-4" style={{ width: "15%" }}>
-                    Actions
-                  </th> */}
+                  <th className="ps-4">Staff Name</th>
+                  <th>Email</th>
+                  <th>Role</th>
+                  <th>Department</th>
+                  <th>College</th>
+                  <th className="text-end pe-4">Actions</th>
                 </tr>
               </thead>
               <tbody>
-                {data && data.length > 0 ? (
-                  data.map((u) => (
-                    <tr key={u._id}>
-                      <td className="ps-4">
-                        <span className="fw-bold text-dark d-block">
-                          {u.name}
-                        </span>
-                      </td>
-                      <td>
-                        {u.rollNo ? (
-                          <span className="text-dark fw-medium">
-                            {u.rollNo}
+                {Array.isArray(data) && data.length > 0 ? (
+                  data
+                    .filter(
+                      (staff) =>
+                        !filterCollege || staff.collegeName === filterCollege,
+                    )
+                    .map((staff) => (
+                      <tr key={staff._id}>
+                        <td className="ps-4">
+                          <div className="d-flex flex-column">
+                            <span className="fw-bold text-dark">
+                              {staff.name}
+                            </span>
+                          </div>
+                        </td>
+                        <td>
+                          {" "}
+                          <span className="text-dark">{staff.email}</span>
+                        </td>
+                        <td>
+                          <span className="modern-badge badge-category text-capitalize">
+                            {staff.role}
                           </span>
-                        ) : (
-                          <span className="text-muted">-</span>
-                        )}
-                      </td>
-                      <td>
-                        <span className="text-secondary fw-medium">
-                          {u.email}
-                        </span>
-                      </td>
-                      <td>
-                        {u.collegeName ? (
+                        </td>
+                        <td>{staff.department}</td>
+                        <td>
                           <span
-                            className={`modern-badge ${getBadgeClassOfCollege(u.collegeName)}`}
+                            className={`modern-badge ${getBadgeClassOfCollege(staff.collegeName)}`}
                           >
-                            {u.collegeName}
+                            {staff.collegeName}
                           </span>
-                        ) : (
-                          <span className="text-muted">-</span>
-                        )}
-                      </td>
-                      <td>
-                        <span className="text-dark small fw-bold text-uppercase">
-                          {u.role || "User"}
-                        </span>
-                      </td>
-
-                      {/* <td className="text-end pe-4">
-                        <div className="d-flex align-items-center justify-content-end gap-2">
-                          <Button
-                            variant="light"
-                            size="sm"
-                            className="action-btn text-primary"
-                            onClick={() => onEdit(u)}
-                          >
-                            <EditIcon fontSize="small" />
-                          </Button>
-                          <Button
-                            variant="light"
-                            size="sm"
-                            className="action-btn text-danger"
-                            onClick={() => onDelete(u._id)}
-                          >
-                            <DeleteIcon fontSize="small" />
-                          </Button>
-                        </div>
-                      </td> */}
-                    </tr>
-                  ))
+                        </td>
+                        <td className="pe-4 text-end">
+                          <div className="d-flex justify-content-end gap-1">
+                            <Tooltip title="Edit">
+                              <button
+                                className="action-btn edit text-primary"
+                                onClick={() => onEdit(staff)}
+                              >
+                                <EditIcon fontSize="small" />
+                              </button>
+                            </Tooltip>
+                            <Tooltip title="Delete">
+                              <button
+                                className="action-btn delete text-danger"
+                                onClick={() =>
+                                  handleDeleteClick(staff._id, staff.name)
+                                }
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </button>
+                            </Tooltip>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
                 ) : (
                   <tr>
-                    <td colSpan="6" className="text-center py-5">
+                    <td colSpan="5" className="text-center py-5">
                       <div className="d-flex flex-column align-items-center justify-content-center p-4">
-                        <FilterListIcon
-                          style={{ fontSize: "48px" }}
-                          className="text-muted opacity-25 mb-3"
-                        />
                         <h6 className="text-secondary fw-bold mb-1">
-                          No users found
+                          No staff records found
                         </h6>
                         <p className="text-muted small mb-0">
-                          Try adjusting your search or filters
+                          Try adjusting your search criteria.
                         </p>
                       </div>
                     </td>
@@ -203,7 +195,6 @@ export default function UsersTable({
             </Table>
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="d-flex justify-content-center mt-4">
               <Pagination className="shadow-sm">
@@ -231,4 +222,18 @@ export default function UsersTable({
       )}
     </>
   );
+}
+
+function getBadgeClassOfCollege(college) {
+  if (!college) return "bg-light text-dark";
+  switch (college.toUpperCase()) {
+    case "KCE":
+      return "badge-college-kce";
+    case "KIT":
+      return "badge-college-kit";
+    case "KAHE":
+      return "badge-college-kahe";
+    default:
+      return "badge-category";
+  }
 }
