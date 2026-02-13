@@ -16,6 +16,8 @@ export default function StaffTable({
   onPageChange,
   searchTerm,
   onSearchChange,
+  filterCollege,
+  onFilterChange,
 }) {
   const handleDeleteClick = (id, name) => {
     Swal.fire({
@@ -53,6 +55,26 @@ export default function StaffTable({
             className="search-input ps-5 py-2"
           />
         </div>
+
+        <div className="d-flex align-items-center gap-2">
+          <span
+            className="text-muted small fw-bold d-none d-md-block"
+            style={{ fontSize: "0.75rem", letterSpacing: "0.05em" }}
+          >
+            COLLEGE:
+          </span>
+          <Form.Select
+            value={filterCollege}
+            onChange={(e) => onFilterChange(e.target.value)}
+            className="filter-select py-2 ps-3 pe-5"
+            style={{ width: "auto", minWidth: "140px" }}
+          >
+            <option value="">All Campuses</option>
+            <option value="KCE">KCE</option>
+            <option value="KIT">KIT</option>
+            <option value="KAHE">KAHE</option>
+          </Form.Select>
+        </div>
       </div>
 
       {loading ? (
@@ -63,7 +85,8 @@ export default function StaffTable({
             <Table className="custom-table mb-0 align-middle">
               <thead>
                 <tr>
-                  <th className="ps-4">Staff Details</th>
+                  <th className="ps-4">Staff Name</th>
+                  <th>Email</th>
                   <th>Role</th>
                   <th>Department</th>
                   <th>College</th>
@@ -72,55 +95,61 @@ export default function StaffTable({
               </thead>
               <tbody>
                 {Array.isArray(data) && data.length > 0 ? (
-                  data.map((staff) => (
-                    <tr key={staff._id}>
-                      <td className="ps-4">
-                        <div className="d-flex flex-column">
-                          <span className="fw-bold text-dark">
-                            {staff.name}
+                  data
+                    .filter(
+                      (staff) =>
+                        !filterCollege || staff.collegeName === filterCollege,
+                    )
+                    .map((staff) => (
+                      <tr key={staff._id}>
+                        <td className="ps-4">
+                          <div className="d-flex flex-column">
+                            <span className="fw-bold text-dark">
+                              {staff.name}
+                            </span>
+                          </div>
+                        </td>
+                        <td>
+                          {" "}
+                          <span className="text-dark">{staff.email}</span>
+                        </td>
+                        <td>
+                          <span className="modern-badge badge-category text-capitalize">
+                            {staff.role}
                           </span>
-                          <span className="text-muted small">
-                            {staff.email}
+                        </td>
+                        <td>{staff.department}</td>
+                        <td>
+                          <span
+                            className={`modern-badge ${getBadgeClassOfCollege(staff.collegeName)}`}
+                          >
+                            {staff.collegeName}
                           </span>
-                        </div>
-                      </td>
-                      <td>
-                        <span className="modern-badge badge-category text-capitalize">
-                          {staff.role}
-                        </span>
-                      </td>
-                      <td>{staff.department}</td>
-                      <td>
-                        <span
-                          className={`modern-badge ${getBadgeClassOfCollege(staff.collegeName)}`}
-                        >
-                          {staff.collegeName}
-                        </span>
-                      </td>
-                      <td className="pe-4 text-end">
-                        <div className="d-flex justify-content-end gap-1">
-                          <Tooltip title="Edit">
-                            <button
-                              className="action-btn edit"
-                              onClick={() => onEdit(staff)}
-                            >
-                              <EditIcon fontSize="small" />
-                            </button>
-                          </Tooltip>
-                          <Tooltip title="Delete">
-                            <button
-                              className="action-btn delete"
-                              onClick={() =>
-                                handleDeleteClick(staff._id, staff.name)
-                              }
-                            >
-                              <DeleteIcon fontSize="small" />
-                            </button>
-                          </Tooltip>
-                        </div>
-                      </td>
-                    </tr>
-                  ))
+                        </td>
+                        <td className="pe-4 text-end">
+                          <div className="d-flex justify-content-end gap-1">
+                            <Tooltip title="Edit">
+                              <button
+                                className="action-btn edit text-primary"
+                                onClick={() => onEdit(staff)}
+                              >
+                                <EditIcon fontSize="small" />
+                              </button>
+                            </Tooltip>
+                            <Tooltip title="Delete">
+                              <button
+                                className="action-btn delete text-danger"
+                                onClick={() =>
+                                  handleDeleteClick(staff._id, staff.name)
+                                }
+                              >
+                                <DeleteIcon fontSize="small" />
+                              </button>
+                            </Tooltip>
+                          </div>
+                        </td>
+                      </tr>
+                    ))
                 ) : (
                   <tr>
                     <td colSpan="5" className="text-center py-5">
