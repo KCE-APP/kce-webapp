@@ -8,6 +8,10 @@ function Sidebar() {
     events: "https://cdn-icons-png.flaticon.com/512/10691/10691802.png",
     users: "https://cdn-icons-png.flaticon.com/512/3135/3135715.png",
     arena: "https://cdn-icons-png.flaticon.com/512/19022/19022138.png",
+    rules: "https://cdn-icons-png.flaticon.com/512/1055/1055644.png",
+    staff: "https://cdn-icons-png.flaticon.com/512/912/912318.png",
+    semester: "https://cdn-icons-png.flaticon.com/512/3652/3652191.png",
+    verfication: "https://cdn-icons-png.flaticon.com/512/9521/9521251.png",
   };
 
   return (
@@ -66,10 +70,51 @@ function Sidebar() {
         </Nav.Link>
         <Nav.Link
           as={NavLink}
+          to="/point-rules"
+          className="sidebar-link d-flex align-items-center gap-3 px-3 py-2 rounded text-decoration-none"
+        >
+          <img
+            src={icons.rules}
+            alt="icon"
+            style={{ width: "24px", height: "24px", objectFit: "contain" }}
+          />
+          <span className="fw-medium">Point Rules</span>
+        </Nav.Link>
+        <Nav.Link
+          as={NavLink}
+          to="/staff"
+          className="sidebar-link d-flex align-items-center gap-3 px-3 py-2 rounded text-decoration-none"
+        >
+          <img
+            src={icons.staff}
+            alt="icon"
+            style={{ width: "24px", height: "24px", objectFit: "contain" }}
+          />
+          <span className="fw-medium">Manage Staff</span>
+        </Nav.Link>
+        <Nav.Link
+          as={NavLink}
+          to="/semester"
+          className="sidebar-link d-flex align-items-center gap-3 px-3 py-2 rounded text-decoration-none"
+        >
+          <img
+            src={icons.semester}
+            alt="icon"
+            style={{ width: "24px", height: "24px", objectFit: "contain" }}
+          />
+          <span className="fw-medium">Manage Semester</span>
+        </Nav.Link>
+        <Nav.Link
+          as={NavLink}
           to="/achieve-management"
           className="sidebar-link d-flex align-items-center gap-3 px-3 py-2 rounded text-decoration-none"
         >
-          <span className="fw-medium">Achievement Management</span>
+          <img
+            src={icons.verfication}
+            alt="icon"
+            style={{ width: "24px", height: "24px", objectFit: "contain" }}
+          />
+          <span className="fw-medium">Submission Approval</span>
         </Nav.Link>
       </Nav>
     </div>
