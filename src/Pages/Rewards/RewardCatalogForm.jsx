@@ -1,5 +1,6 @@
 import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Form, Row, Col, Card } from "react-bootstrap";
+import { Upload as UploadIcon, X as XIcon } from "lucide-react";
 
 const RewardCatalogForm = forwardRef(
   ({ initialData, onSave, onCancel, setIsDirty }, ref) => {
@@ -11,6 +12,8 @@ const RewardCatalogForm = forwardRef(
       pointsCost: "",
       stock: "",
       category: "",
+      image: null,
+      imageUrl: "", // For preview
     });
 
     const [errors, setErrors] = useState({});
@@ -29,11 +32,17 @@ const RewardCatalogForm = forwardRef(
         if (validate()) {
           setIsSubmitting(true);
           try {
-            await onSave({
-              ...form,
-              pointsCost: Number(form.pointsCost),
-              stock: Number(form.stock),
-            });
+            const formData = new FormData();
+            formData.append("name", form.name);
+            formData.append("pointsCost", form.pointsCost);
+            formData.append("stock", form.stock);
+            formData.append("category", form.category);
+
+            if (form.image) {
+              formData.append("image", form.image);
+            }
+
+            await onSave(formData);
             return true;
           } catch (error) {
             console.error("Submit failed", error);
@@ -53,13 +62,28 @@ const RewardCatalogForm = forwardRef(
           pointsCost: initialData.pointsCost || "",
           stock: initialData.stock || "",
           category: initialData.category || "Merchandise",
+          image: null,
+          imageUrl: initialData.imageUrl || "",
         });
       }
     }, [initialData]);
 
     const handleChange = (e) => {
-      const { name, value } = e.target;
-      setForm({ ...form, [name]: value });
+      const { name, value, files } = e.target;
+
+      if (name === "image") {
+        const file = files[0];
+        if (file) {
+          setForm({
+            ...form,
+            image: file,
+            imageUrl: URL.createObjectURL(file),
+          });
+        }
+      } else {
+        setForm({ ...form, [name]: value });
+      }
+
       if (errors[name]) {
         setErrors({ ...errors, [name]: null });
       }
@@ -81,19 +105,8 @@ const RewardCatalogForm = forwardRef(
 
     const handleSubmit = async (e) => {
       e.preventDefault();
-      if (validate()) {
-        setIsSubmitting(true);
-        try {
-          await onSave({
-            ...form,
-            pointsCost: Number(form.pointsCost),
-            stock: Number(form.stock),
-          });
-        } catch (error) {
-          console.error("Error submitting form:", error);
-        } finally {
-          setIsSubmitting(false);
-        }
+      if (ref.current) {
+        ref.current.submitForm();
       }
     };
 
@@ -113,100 +126,173 @@ const RewardCatalogForm = forwardRef(
         <Card.Body className="p-4">
           <Form onSubmit={handleSubmit}>
             <Row className="mb-4">
-              <Col md={12}>
-                <Form.Group controlId="formName">
-                  <Form.Label>
-                    Reward Name <span className="text-danger">*</span>
-                  </Form.Label>
-                  <Form.Control
-                    type="text"
-                    name="name"
-                    value={form.name}
-                    onChange={handleChange}
-                    placeholder="e.g. KCE Branding Hoodie"
-                    isInvalid={!!errors.name}
-                    className="shadow-none"
-                    style={{ borderRadius: "6px" }}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.name}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-            </Row>
+              <Col md={8}>
+                <Row className="mb-3">
+                  <Col md={12}>
+                    <Form.Group controlId="formName">
+                      <Form.Label>
+                        Reward Name <span className="text-danger">*</span>
+                      </Form.Label>
+                      <Form.Control
+                        type="text"
+                        name="name"
+                        value={form.name}
+                        onChange={handleChange}
+                        placeholder="e.g. KCE Branding Hoodie"
+                        isInvalid={!!errors.name}
+                        className="shadow-none"
+                        style={{ borderRadius: "6px" }}
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        {errors.name}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                  </Col>
+                </Row>
 
-            <Row className="mb-4">
-              <Col md={6}>
-                <Form.Group controlId="formPoints">
-                  <Form.Label>
-                    Points Cost <span className="text-danger">*</span>
-                  </Form.Label>
-                  <Form.Control
-                    type="number"
-                    name="pointsCost"
-                    value={form.pointsCost}
-                    onChange={handleChange}
-                    placeholder="Enter points required"
-                    isInvalid={!!errors.pointsCost}
-                    className="shadow-none"
-                    style={{ borderRadius: "6px" }}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.pointsCost}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-              <Col md={6}>
-                <Form.Group controlId="formStock">
-                  <Form.Label>
-                    Initial Stock <span className="text-danger">*</span>
-                  </Form.Label>
-                  <Form.Control
-                    type="number"
-                    name="stock"
-                    value={form.stock}
-                    onChange={handleChange}
-                    placeholder="Enter available quantity"
-                    isInvalid={!!errors.stock}
-                    className="shadow-none"
-                    style={{ borderRadius: "6px" }}
-                  />
-                  <Form.Control.Feedback type="invalid">
-                    {errors.stock}
-                  </Form.Control.Feedback>
-                </Form.Group>
-              </Col>
-            </Row>
+                <Row className="mb-3">
+                  <Col md={6}>
+                    <Form.Group controlId="formPoints">
+                      <Form.Label>
+                        Points Cost <span className="text-danger">*</span>
+                      </Form.Label>
+                      <Form.Control
+                        type="number"
+                        name="pointsCost"
+                        value={form.pointsCost}
+                        onChange={handleChange}
+                        placeholder="Enter points required"
+                        isInvalid={!!errors.pointsCost}
+                        className="shadow-none"
+                        style={{ borderRadius: "6px" }}
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        {errors.pointsCost}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                  </Col>
+                  <Col md={6}>
+                    <Form.Group controlId="formStock">
+                      <Form.Label>
+                        Initial Stock <span className="text-danger">*</span>
+                      </Form.Label>
+                      <Form.Control
+                        type="number"
+                        name="stock"
+                        value={form.stock}
+                        onChange={handleChange}
+                        placeholder="Enter available quantity"
+                        isInvalid={!!errors.stock}
+                        className="shadow-none"
+                        style={{ borderRadius: "6px" }}
+                      />
+                      <Form.Control.Feedback type="invalid">
+                        {errors.stock}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                  </Col>
+                </Row>
 
-            <Row className="mb-4">
-              <Col md={12}>
-                <Form.Group controlId="formCategory">
-                  <Form.Label>
-                    Category <span className="text-danger">*</span>
-                  </Form.Label>
-                  <Form.Select
-                    name="category"
-                    value={form.category}
-                    onChange={handleChange}
-                    isInvalid={!!errors.category}
-                    className="shadow-none"
-                    style={{ borderRadius: "6px" }}
+                <Row>
+                  <Col md={12}>
+                    <Form.Group controlId="formCategory">
+                      <Form.Label>
+                        Category <span className="text-danger">*</span>
+                      </Form.Label>
+                      <Form.Select
+                        name="category"
+                        value={form.category}
+                        onChange={handleChange}
+                        isInvalid={!!errors.category}
+                        className="shadow-none"
+                        style={{ borderRadius: "6px" }}
+                      >
+                        <option value="">Select Category</option>
+                        {CATEGORIES.map((cat) => (
+                          <option key={cat} value={cat}>
+                            {cat}
+                          </option>
+                        ))}
+                      </Form.Select>
+                      <Form.Control.Feedback type="invalid">
+                        {errors.category}
+                      </Form.Control.Feedback>
+                    </Form.Group>
+                  </Col>
+                </Row>
+              </Col>
+
+              <Col md={4}>
+                <Form.Group controlId="formImage" className="h-100">
+                  <Form.Label>Reward Image</Form.Label>
+                  <div
+                    className="border rounded p-3 d-flex flex-column align-items-center justify-content-center text-center bg-light"
+                    style={{
+                      borderStyle: "dashed !important",
+                      borderWidth: "2px",
+                      borderColor: errors.image ? "#dc3545" : "#dee2e6",
+                      height: "calc(100% - 30px)",
+                      minHeight: "200px",
+                    }}
                   >
-                    <option value="">Select Category</option>
-                    {CATEGORIES.map((cat) => (
-                      <option key={cat} value={cat}>
-                        {cat}
-                      </option>
-                    ))}
-                  </Form.Select>
-                  <Form.Control.Feedback type="invalid">
-                    {errors.category}
-                  </Form.Control.Feedback>
+                    {form.imageUrl ? (
+                      <div className="position-relative w-100 h-100 d-flex align-items-center justify-content-center">
+                        <img
+                          src={
+                            form.imageUrl.startsWith("blob:")
+                              ? form.imageUrl
+                              : `${import.meta.env.VITE_IMAGE_BASE_URL || ""}/${form.imageUrl}`
+                          }
+                          alt="Preview"
+                          className="img-fluid rounded"
+                          style={{ maxHeight: "200px", objectFit: "contain" }}
+                        />
+                        <button
+                          type="button"
+                          className="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 rounded-circle p-1"
+                          style={{
+                            width: "24px",
+                            height: "24px",
+                            lineHeight: 1,
+                          }}
+                          onClick={() => {
+                            setForm({ ...form, image: null, imageUrl: "" });
+                            if (setIsDirty) setIsDirty(true);
+                          }}
+                        >
+                          <XIcon size={14} />
+                        </button>
+                      </div>
+                    ) : (
+                      <>
+                        <UploadIcon size={32} className="text-muted mb-2" />
+                        <p className="small text-muted mb-2">
+                          Click to upload image
+                          <br />
+                          <span className="text-xs">(JPG, PNG max 2MB)</span>
+                        </p>
+                        <Form.Control
+                          type="file"
+                          name="image"
+                          onChange={handleChange}
+                          accept="image/*"
+                          className="d-none"
+                          id="image-upload"
+                        />
+                        <label
+                          htmlFor="image-upload"
+                          className="btn btn-sm btn-outline-primary"
+                        >
+                          Choose File
+                        </label>
+                      </>
+                    )}
+                  </div>
                 </Form.Group>
               </Col>
             </Row>
 
-            <div className="d-flex justify-content-end gap-2 mt-4">
+            <div className="d-flex justify-content-end gap-2 mt-4 pt-3 border-top">
               <button
                 type="button"
                 className="btn btn-light px-4"
