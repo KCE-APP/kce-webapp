@@ -407,6 +407,7 @@ export default function AchievementDetails() {
                   onClick={() => {
                     setShowModal(false);
                     setApiSuccess(false);
+                    navigate(-1);
                   }}
                   style={{
                     padding: "12px 28px",
