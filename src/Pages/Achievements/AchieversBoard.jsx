@@ -18,9 +18,23 @@ export default function AchieverBoard({
 }) {
   const navigate = useNavigate();
 
+  const rewardStyles = {
+    "certification completion": { bg: "#eef2ff", text: "#4338ca" },
+    "hackathon participation": { bg: "#f3f4f6", text: "#374151" },
+    "hackathon winner": { bg: "#fff7ed", text: "#ea580c" },
+    "competition finalist": { bg: "#fdf2f8", text: "#be185d" },
+    "top internal performer": { bg: "#ecfdf5", text: "#047857" },
+    "special recognition post": { bg: "#f0f9ff", text: "#0369a1" },
+  };
+
+  const statusStyles = {
+    approved: { bg: "#e6f7ee", text: "#1e7e34" },
+    rejected: { bg: "#fdecec", text: "#d93025" },
+    pending: { bg: "#fff4ec", text: "#f97316" },
+  };
+
   return (
     <div className="px-4 px-lg-4 py-3">
-      {/* Toolbar */}
       <div className="d-flex justify-content-center mb-4">
         <div className="position-relative w-100" style={{ maxWidth: "480px" }}>
           <SearchIcon
@@ -48,12 +62,6 @@ export default function AchieverBoard({
               border: "1px solid rgba(249,115,22,0.3)",
               fontSize: "0.9rem",
             }}
-            onFocus={(e) =>
-              (e.target.style.boxShadow = "0 0 0 3px rgba(249,115,22,0.25)")
-            }
-            onBlur={(e) =>
-              (e.target.style.boxShadow = "0 2px 10px rgba(249,115,22,0.08)")
-            }
           />
         </div>
       </div>
@@ -62,7 +70,6 @@ export default function AchieverBoard({
         <div className="text-center py-5">Loading...</div>
       ) : (
         <>
-          {/* Table */}
           <div className="modern-card table-responsive">
             <Table hover className="custom-table mb-0 align-middle text-center">
               <thead>
@@ -81,116 +88,90 @@ export default function AchieverBoard({
 
               <tbody>
                 {data && data.length > 0 ? (
-                  data.map((student) => (
-                    <tr
-                      key={student._id}
-                      onClick={() =>
-                        navigate(`/achieve-management/${student._id}`)
-                      }
-                      style={{ cursor: "pointer" }}
-                    >
-                      <td className="ps-4 text-center fw-bold text-dark">
-                        {student.name}
-                      </td>
+                  data.map((student) => {
+                    const type = (student.rewardType || "")
+                      .toLowerCase()
+                      .trim();
+                    const rewardStyle = rewardStyles[type] || {
+                      bg: "#fff4ec",
+                      text: "#f97316",
+                    };
 
-                      <td className="fw-medium text-dark">
-                        {student.rollNo || "-"}
-                      </td>
+                    const statusKey = (student.status || "pending")
+                      .toLowerCase()
+                      .trim();
+                    const statusStyle =
+                      statusStyles[statusKey] || statusStyles.pending;
 
-                      <td>
-                        <span
-                          style={{
-                            padding: "4px 14px",
-                            borderRadius: "20px",
-                            fontSize: "0.75rem",
-                            fontWeight: 600,
-                            display: "inline-flex",
-                            alignItems: "center",
-                            gap: "6px",
-                            backgroundColor:
-                              student.rewardType === "Certification Completion"
-                                ? "#eef2ff"
-                                : student.rewardType ===
-                                    "Hackathon Participation"
-                                  ? "#f3f4f6"
-                                  : student.rewardType === "Hackathon Winner"
-                                    ? "#fff7ed"
-                                    : student.rewardType ===
-                                        "Competition Finalist"
-                                      ? "#fdf2f8"
-                                      : student.rewardType ===
-                                          "Top Internal Performer"
-                                        ? "#ecfdf5"
-                                        : student.rewardType ===
-                                            "Special Recognition Post"
-                                          ? "#f0f9ff"
-                                          : "#fff4ec",
-                            color:
-                              student.rewardType === "Certification Completion"
-                                ? "#4338ca"
-                                : student.rewardType ===
-                                    "Hackathon Participation"
-                                  ? "#374151"
-                                  : student.rewardType === "Hackathon Winner"
-                                    ? "#ea580c"
-                                    : student.rewardType ===
-                                        "Competition Finalist"
-                                      ? "#be185d"
-                                      : student.rewardType ===
-                                          "Top Internal Performer"
-                                        ? "#047857"
-                                        : student.rewardType ===
-                                            "Special Recognition Post"
-                                          ? "#0369a1"
-                                          : "#f97316",
-                          }}
-                        >
-                          <EmojiEventsIcon style={{ fontSize: "15px" }} />
-                          {student.rewardType}
-                        </span>
-                      </td>
+                    return (
+                      <tr
+                        key={student._id}
+                        onClick={() =>
+                          navigate(
+                            `/achieve-management/${student.submissionId}`,
+                          )
+                        }
+                        style={{ cursor: "pointer" }}
+                      >
+                        <td className="ps-4 fw-bold text-dark">
+                          {student.name}
+                        </td>
 
-                      <td>
-                        <span
-                          style={{
-                            padding: "4px 14px",
-                            borderRadius: "20px",
-                            fontSize: "0.75rem",
-                            fontWeight: 600,
-                            textTransform: "uppercase",
-                            backgroundColor:
-                              (student.status || "Applied") === "Approved"
-                                ? "#e6f7ee"
-                                : (student.status || "Applied") === "Rejected"
-                                  ? "#fdecec"
-                                  : "#fff4ec",
-                            color:
-                              (student.status || "Applied") === "Approved"
-                                ? "#1e7e34"
-                                : (student.status || "Applied") === "Rejected"
-                                  ? "#d93025"
-                                  : "#f97316",
-                          }}
-                        >
-                          {student.status || "Applied"}
-                        </span>
-                      </td>
+                        <td className="fw-medium text-dark">
+                          {student.rollNo || "-"}
+                        </td>
 
-                      <td className="text-end pe-4">
-                        <Button
-                          variant="light"
-                          size="sm"
-                          className="text-danger"
-                          onClick={(e) => {
-                            e.stopPropagation(); // 🔥 prevent row navigation
-                            onDelete(student._id);
-                          }}
-                        >
-                          <DeleteIcon fontSize="small" />
-                        </Button>
-                      </td>
-                    </tr>
-                  ))
+                        <td>
+                          <span
+                            style={{
+                              padding: "4px 14px",
+                              borderRadius: "20px",
+                              fontSize: "0.75rem",
+                              fontWeight: 600,
+                              display: "inline-flex",
+                              alignItems: "center",
+                              gap: "6px",
+                              backgroundColor: rewardStyle.bg,
+                              color: rewardStyle.text,
+                            }}
+                          >
+                            <EmojiEventsIcon style={{ fontSize: "15px" }} />
+                            {student.rewardType}
+                          </span>
+                        </td>
+
+                        <td>
+                          <span
+                            style={{
+                              padding: "4px 14px",
+                              borderRadius: "20px",
+                              fontSize: "0.75rem",
+                              fontWeight: 600,
+                              textTransform: "uppercase",
+                              backgroundColor: statusStyle.bg,
+                              color: statusStyle.text,
+                            }}
+                          >
+                            {statusKey}
+                          </span>
+                        </td>
+
+                        <td className="text-end pe-4">
+                          <Button
+                            variant="light"
+                            size="sm"
+                            className="text-danger"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onDelete(student._id);
+                            }}
+                          >
+                            <DeleteIcon fontSize="small" />
+                          </Button>
+                        </td>
+                      </tr>
+                    );
+                  })
                 ) : (
                   <tr>
                     <td colSpan="5" className="text-center py-5">
@@ -213,7 +194,6 @@ export default function AchieverBoard({
             </Table>
           </div>
 
-          {/* Pagination */}
           {totalPages > 1 && (
             <div className="d-flex justify-content-center mt-4">
               <Pagination className="shadow-sm">

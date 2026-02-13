@@ -28,11 +28,45 @@ export default function AchieverBoardContainer() {
 
   const itemsPerPage = 10;
 
+  const fetchSubmission = useCallback(async () => {
+    try {
+      setLoading(true);
+
+      const res = await api.get("/rewards/submissions");
+
+      const formatted = res.data.data.map((item) => ({
+        ...item,
+        _id: item.submissionId,
+        rewardType: item.category,
+        status: item.status
+          ? item.status.charAt(0).toUpperCase() + item.status.slice(1)
+          : "Pending",
+      }));
+
+      setData(formatted);
+    } catch (error) {
+      console.error("Error fetching submissions:", error);
+      setData([]);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  useEffect(() => {
+    fetchSubmission();
+  }, [fetchSubmission]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [searchTerm]);
+
   const filteredData = useMemo(() => {
+    const lowerSearch = searchTerm.toLowerCase();
+
     return data.filter(
       (student) =>
-        student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
-        student.rollNo.toLowerCase().includes(searchTerm.toLowerCase()),
+        (student.name || "").toLowerCase().includes(lowerSearch) ||
+        (student.rollNo || "").toLowerCase().includes(lowerSearch),
     );
   }, [data, searchTerm]);
 
@@ -43,15 +77,19 @@ export default function AchieverBoardContainer() {
     return filteredData.slice(start, start + itemsPerPage);
   }, [filteredData, currentPage]);
 
-  const handleDelete = (id) => {
-    const updated = data.filter((student) => student._id !== id);
-    setData(updated);
+  const handleDelete = async (id) => {
+    try {
+      const updated = data.filter((student) => student._id !== id);
+      setData(updated);
+    } catch (error) {
+      console.error("Delete failed:", error);
+    }
   };
 
   return (
     <AchieverBoard
       data={paginatedData}
-      loading={false}
+      loading={loading}
       currentPage={currentPage}
       totalPages={totalPages}
       onPageChange={setCurrentPage}
