@@ -3,6 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEventsOutlined";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import api from "../../api/axios";
+import AchievementDetailsPlaceholder, { SkeletonBox } from "../../component/AchievementDetailsPlaceholder";
 
 export default function AchievementDetails() {
   const [processing, setProcessing] = useState(false);
@@ -15,6 +16,7 @@ export default function AchievementDetails() {
   const [showModal, setShowModal] = useState(false);
   const [actionType, setActionType] = useState("");
   const [rejectionReason, setRejectionReason] = useState("");
+  const [imageLoading, setImageLoading] = useState(true);
 
   useEffect(() => {
     const fetchAPI = async () => {
@@ -75,10 +77,9 @@ export default function AchievementDetails() {
     setRejectionReason("");
   };
 
+
   if (loading) {
-    return (
-      <div style={{ padding: "80px", textAlign: "center" }}>Loading...</div>
-    );
+   return <AchievementDetailsPlaceholder/>
   }
 
   if (!achievement) {
@@ -86,6 +87,9 @@ export default function AchievementDetails() {
       <div style={{ padding: "80px", textAlign: "center" }}>No data found</div>
     );
   }
+
+
+
 
   const statusColors = {
     pending: { bg: "#fff4ec", text: "#f97316" },
@@ -98,6 +102,7 @@ export default function AchievementDetails() {
   const imageUrl = achievement.evidenceImage
     ? `${import.meta.env.VITE_IMAGE_BASE_URL}/${achievement.evidenceImage}`
     : null;
+
 
   return (
     <>
@@ -185,31 +190,40 @@ export default function AchievementDetails() {
           {imageUrl && (
             <div style={{ marginBottom: "50px" }}>
               <Label>Evidence</Label>
+              {imageLoading && (
+                <div style={{ marginTop: "10px" }}>
+                  <SkeletonBox height="400px" width="100%" radius="16px" />
+                </div>
+              )}
               <img
                 src={imageUrl}
                 alt="Evidence"
+                onLoad={() => setImageLoading(false)}
                 style={{
                   width: "100%",
                   maxHeight: "400px",
                   objectFit: "cover",
                   borderRadius: "16px",
                   marginTop: "10px",
+                  display: imageLoading ? "none" : "block",
                 }}
               />
-              <div style={{ marginTop: "15px" }}>
-                <a
-                  href={imageUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  style={{
-                    color: "#f97316",
-                    fontWeight: 600,
-                    textDecoration: "none",
-                  }}
-                >
-                  View Full Image →
-                </a>
-              </div>
+              {!imageLoading && (
+                <div style={{ marginTop: "15px" }}>
+                  <a
+                    href={imageUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    style={{
+                      color: "#f97316",
+                      fontWeight: 600,
+                      textDecoration: "none",
+                    }}
+                  >
+                    View Full Image →
+                  </a>
+                </div>
+              )}
             </div>
           )}
 
