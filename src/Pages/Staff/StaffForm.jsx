@@ -15,6 +15,8 @@ const StaffForm = forwardRef(
       department: "",
     });
 
+    const [passwordLocked, setPasswordLocked] = useState(isEditMode);
+
     const [errors, setErrors] = useState({});
 
     const DEPARTMENTS = [
@@ -58,11 +60,12 @@ const StaffForm = forwardRef(
         setForm({
           name: initialData.name || "",
           email: initialData.email || "",
-          password: "", // Don't populate password on edit for security
+          password: "",
           role: initialData.role || "instructor",
           collegeName: initialData.collegeName || "",
           department: initialData.department || "",
         });
+        setPasswordLocked(true);
       }
     }, [initialData]);
 
@@ -160,7 +163,8 @@ const StaffForm = forwardRef(
                     onChange={handleChange}
                     placeholder="staff@kce.ac.in"
                     isInvalid={!!errors.email}
-                    className="shadow-none"
+                    readOnly={isEditMode}
+                    className={`shadow-none ${isEditMode ? "bg-light" : ""}`}
                     style={{ borderRadius: "6px" }}
                   />
                   <Form.Control.Feedback type="invalid">
@@ -178,17 +182,17 @@ const StaffForm = forwardRef(
                     {!isEditMode && <span className="text-danger">*</span>}
                   </Form.Label>
                   <Form.Control
-                    type="password"
+                    type={passwordLocked ? "text" : "password"}
                     name="password"
-                    value={form.password}
+                    value={passwordLocked ? "********" : form.password}
                     onChange={handleChange}
+                    onClick={() => isEditMode && setPasswordLocked(false)}
+                    readOnly={passwordLocked}
                     placeholder={
-                      isEditMode
-                        ? "Leave blank to keep current"
-                        : "Enter password"
+                      isEditMode ? "Click to change password" : "Enter password"
                     }
                     isInvalid={!!errors.password}
-                    className="shadow-none"
+                    className={`shadow-none ${passwordLocked ? "bg-light cursor-pointer" : ""}`}
                     style={{ borderRadius: "6px" }}
                   />
                   <Form.Control.Feedback type="invalid">

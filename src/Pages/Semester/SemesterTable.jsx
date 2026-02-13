@@ -108,7 +108,7 @@ export default function SemesterTable({
                         <div className="d-flex justify-content-end gap-1">
                           <Tooltip title="Edit">
                             <button
-                              className="action-btn edit"
+                              className="action-btn edit text-primary"
                               onClick={() => onEdit(sem)}
                             >
                               <EditIcon fontSize="small" />
@@ -116,7 +116,7 @@ export default function SemesterTable({
                           </Tooltip>
                           <Tooltip title="Delete">
                             <button
-                              className="action-btn delete"
+                              className="action-btn delete text-danger"
                               onClick={() =>
                                 handleDeleteClick(
                                   sem._id,

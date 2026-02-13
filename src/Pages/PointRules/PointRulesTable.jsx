@@ -5,6 +5,11 @@ import SearchIcon from "@mui/icons-material/Search";
 import { Tooltip } from "@mui/material";
 import Swal from "sweetalert2";
 import TablePlaceholder from "../../component/TablePlaceholder";
+import StarsIcon from "@mui/icons-material/Stars";
+import EmojiEventsIcon from "@mui/icons-material/EmojiEvents";
+import WorkspacePremiumIcon from "@mui/icons-material/WorkspacePremium";
+import LocalActivityIcon from "@mui/icons-material/LocalActivity";
+import MoreHorizIcon from "@mui/icons-material/MoreHoriz";
 
 export default function PointRulesTable({
   data,
@@ -38,6 +43,19 @@ export default function PointRulesTable({
     });
   };
 
+  const getCategoryIcon = (category) => {
+    const cat = category.toLowerCase();
+    if (cat.includes("winner") || cat.includes("1st") || cat.includes("first"))
+      return <EmojiEventsIcon sx={{ color: "#f59e0b", fontSize: 20 }} />;
+    if (cat.includes("certification") || cat.includes("course"))
+      return <WorkspacePremiumIcon sx={{ color: "#3b82f6", fontSize: 20 }} />;
+    if (cat.includes("runner") || cat.includes("participation"))
+      return <StarsIcon sx={{ color: "#10b981", fontSize: 20 }} />;
+    if (cat.includes("competition") || cat.includes("event"))
+      return <LocalActivityIcon sx={{ color: "#8b5cf6", fontSize: 20 }} />;
+    return <MoreHorizIcon sx={{ color: "#64748b", fontSize: 20 }} />;
+  };
+
   return (
     <>
       <div className="toolbar-card d-flex flex-column flex-lg-row align-items-center justify-content-between gap-3 mb-3">
@@ -63,10 +81,12 @@ export default function PointRulesTable({
             <Table className="custom-table mb-0 align-middle">
               <thead>
                 <tr>
-                  <th className="ps-4" style={{ width: "60%" }}>
-                    Category
+                  <th className="ps-4" style={{ width: "55%" }}>
+                    Category Name
                   </th>
-                  <th style={{ width: "25%" }}>Points</th>
+                  <th className="text-center" style={{ width: "30%" }}>
+                    Reward Value
+                  </th>
                   <th className="text-end pe-4" style={{ width: "15%" }}>
                     Actions
                   </th>
@@ -75,18 +95,42 @@ export default function PointRulesTable({
               <tbody>
                 {Array.isArray(data) && data.length > 0 ? (
                   data.map((rule) => (
-                    <tr key={rule._id}>
-                      <td className="ps-4 font-weight-bold">{rule.category}</td>
-                      <td>
-                        <span className="modern-badge badge-category">
+                    <tr key={rule._id} className="align-middle">
+                      <td className="ps-4 py-3">
+                        <div className="d-flex align-items-center gap-3">
+                          <div
+                            className="p-2 rounded-circle bg-light d-flex align-items-center justify-content-center"
+                            style={{ width: "40px", height: "40px" }}
+                          >
+                            {getCategoryIcon(rule.category)}
+                          </div>
+                          <div>
+                            <div className="fw-bold text-dark mb-0">
+                              {rule.category}
+                            </div>
+                          </div>
+                        </div>
+                      </td>
+                      <td className="text-center py-3">
+                        <span
+                          className="modern-badge d-inline-flex align-items-center gap-2 px-3 py-2"
+                          style={{
+                            backgroundColor: "#fff7ed",
+                            color: "#c2410c",
+                            border: "1px solid #ffedd5",
+                            borderRadius: "30px",
+                            fontWeight: "700",
+                          }}
+                        >
+                          <StarsIcon style={{ fontSize: "16px" }} />
                           {rule.points} Points
                         </span>
                       </td>
-                      <td className="pe-4 text-end">
+                      <td className="pe-4 text-end py-3">
                         <div className="d-flex justify-content-end gap-1">
                           <Tooltip title="Edit">
                             <button
-                              className="action-btn edit"
+                              className="action-btn edit text-primary"
                               onClick={() => onEdit(rule)}
                             >
                               <EditIcon fontSize="small" />
@@ -94,7 +138,7 @@ export default function PointRulesTable({
                           </Tooltip>
                           <Tooltip title="Delete">
                             <button
-                              className="action-btn delete"
+                              className="action-btn delete text-danger"
                               onClick={() =>
                                 handleDeleteClick(rule._id, rule.category)
                               }

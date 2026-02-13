@@ -14,6 +14,7 @@ export default function StaffPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterCollege, setFilterCollege] = useState("");
 
   // Dirty State Logic
   const [isDirty, setIsDirty] = useState(false);
@@ -31,6 +32,7 @@ export default function StaffPage() {
           page: currentPage,
           limit: 10,
           search: searchTerm,
+          collegeName: filterCollege,
         },
       });
 
@@ -56,7 +58,7 @@ export default function StaffPage() {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [currentPage, searchTerm]);
+  }, [currentPage, searchTerm, filterCollege]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -64,6 +66,11 @@ export default function StaffPage() {
 
   const handleSearchChange = (term) => {
     setSearchTerm(term);
+    setCurrentPage(1);
+  };
+
+  const handleFilterChange = (college) => {
+    setFilterCollege(college);
     setCurrentPage(1);
   };
 
@@ -81,7 +88,24 @@ export default function StaffPage() {
   const handleSave = async (payload) => {
     try {
       if (editingItem) {
-        await api.patch(`/staff/${editingItem._id}`, payload);
+        // Construct refined payload as per user's curl example
+        const updatePayload = {
+          name: payload.name,
+          role: payload.role,
+          department: payload.department,
+          collegeName: payload.collegeName,
+        };
+
+        // If password was changed (not the mask), include it
+        if (
+          payload.password &&
+          payload.password.trim() !== "" &&
+          payload.password !== "*********"
+        ) {
+          updatePayload.password = payload.password;
+        }
+
+        await api.patch(`/staff/${editingItem._id}`, updatePayload);
         Swal.fire({
           icon: "success",
           title: "Staff details updated successfully!",
@@ -212,6 +236,8 @@ export default function StaffPage() {
           onPageChange={handlePageChange}
           searchTerm={searchTerm}
           onSearchChange={handleSearchChange}
+          filterCollege={filterCollege}
+          onFilterChange={handleFilterChange}
         />
       )}
 
