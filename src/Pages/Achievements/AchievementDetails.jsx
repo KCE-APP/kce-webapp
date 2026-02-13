@@ -16,33 +16,14 @@ export default function AchievementDetails() {
   useEffect(() => {
     const fetchAPI = async () => {
       try {
-        setLoading(true);
-
         const res = await api.get(`/rewards/submission/${achievementInfo}`);
-
-        const item = res.data.data;
-
-        const formatted = {
-          _id: item.submissionId,
-          name: item.name,
-          rollNo: item.rollNo,
-          rewardType: item.category,
-          status: item.status?.toLowerCase() || "pending",
-          title: item.title,
-          description: item.description || "No description provided.",
-          appliedDate: item.appliedDate || "N/A",
-          approvedDate: item.approvedDate || null,
-          proofLink: item.proofLink || "",
-        };
-
-        setAchievement(formatted);
+        setAchievement(res.data.data);
       } catch (error) {
-        console.error("Error fetching achievement:", error);
+        console.error(error);
       } finally {
         setLoading(false);
       }
     };
-
     fetchAPI();
   }, [achievementInfo]);
 
@@ -60,124 +41,179 @@ export default function AchievementDetails() {
     setAchievement((prev) => ({
       ...prev,
       status: actionType === "accept" ? "approved" : "rejected",
-      approvedDate:
-        actionType === "accept" ? new Date().toISOString().split("T")[0] : null,
     }));
-
     closeModal();
   };
 
   if (loading) {
     return (
-      <div className="px-4 py-5 text-center">
-        <h5>Loading achievement details...</h5>
-      </div>
+      <div style={{ padding: "80px", textAlign: "center" }}>Loading...</div>
     );
   }
 
   if (!achievement) {
     return (
-      <div className="px-4 py-5 text-center">
-        <h5>No achievement found.</h5>
-      </div>
+      <div style={{ padding: "80px", textAlign: "center" }}>No data found</div>
     );
   }
 
+  const statusColors = {
+    pending: { bg: "#fff4ec", text: "#f97316" },
+    approved: { bg: "#e6f7ee", text: "#1e7e34" },
+    rejected: { bg: "#fdecec", text: "#d93025" },
+  };
+
+  const statusStyle = statusColors[achievement.status] || statusColors.pending;
+
+  const imageUrl = achievement.evidenceImage
+    ? `http://localhost:5000/${achievement.evidenceImage}`
+    : null;
+
   return (
     <>
-      <div className="px-4 px-lg-5 py-4">
-        <div className="bg-white rounded-3 shadow-sm p-4">
-          {/* Back Button */}
-          <button
-            className="btn btn-light mb-3 d-flex align-items-center gap-2"
-            onClick={() => navigate(-1)}
+      <div style={{ minHeight: "100vh", padding: "20px 100px" }}>
+        <button
+          onClick={() => navigate(-1)}
+          style={{
+            background: "transparent",
+            border: "none",
+            color: "#6e6e73",
+            display: "flex",
+            alignItems: "center",
+            gap: "6px",
+            fontSize: "14px",
+            marginBottom: "40px",
+            cursor: "pointer",
+          }}
+        >
+          <ArrowBackIcon fontSize="small" />
+          Back
+        </button>
+
+        <div
+          style={{
+            background: "#ffffff",
+            borderRadius: "24px",
+            padding: "40px",
+            boxShadow: "0 10px 40px rgba(0,0,0,0.05)",
+          }}
+        >
+          <EmojiEventsIcon style={{ fontSize: "44px", color: "#f97316" }} />
+          <h1 style={{ marginTop: "20px", fontSize: "32px" }}>
+            {achievement.title}
+          </h1>
+
+          <p style={{ color: "#6e6e73", marginBottom: "40px" }}>
+            Submitted on {new Date(achievement.createdAt).toDateString()}
+          </p>
+
+          <div
+            style={{
+              display: "grid",
+              gridTemplateColumns: "1fr 1fr",
+              gap: "40px",
+              marginBottom: "40px",
+            }}
           >
-            <ArrowBackIcon fontSize="small" />
-            Back
-          </button>
+            <Info label="Student Name" value={achievement.studentId?.name} />
+            <Info
+              label="Roll Number"
+              value={achievement.studentId?.rollNo || "-"}
+            />
+            <Info
+              label="Department"
+              value={achievement.studentId?.department}
+            />
+            <Info label="College" value={achievement.studentId?.collegeName} />
+            <Info label="Category" value={achievement.category} />
+            <Info label="Points Awarded" value={achievement.pointsAwarded} />
 
-          {/* Header */}
-          <div className="d-flex align-items-center gap-3 mb-4">
-            <EmojiEventsIcon style={{ fontSize: "40px", color: "#f97316" }} />
             <div>
-              <h4 className="fw-bold mb-1">{achievement.title}</h4>
-              <span className="text-muted small">
-                Applied on {achievement.appliedDate}
-              </span>
+              <Label>Status</Label>
+              <div
+                style={{
+                  padding: "6px 18px",
+                  borderRadius: "999px",
+                  fontSize: "13px",
+                  fontWeight: 600,
+                  display: "inline-block",
+                  backgroundColor: statusStyle.bg,
+                  color: statusStyle.text,
+                  textTransform: "uppercase",
+                }}
+              >
+                {achievement.status}
+              </div>
             </div>
           </div>
 
-          <hr />
-
-          {/* Details */}
-          <div className="row mt-4">
-            <div className="col-md-6 mb-3">
-              <h6 className="text-muted">Student Name</h6>
-              <p className="fw-semibold">{achievement.name}</p>
-            </div>
-
-            <div className="col-md-6 mb-3">
-              <h6 className="text-muted">Roll No</h6>
-              <p className="fw-semibold">{achievement.rollNo || "-"}</p>
-            </div>
-
-            <div className="col-md-6 mb-3">
-              <h6 className="text-muted">Reward Type</h6>
-              <p className="fw-semibold">{achievement.rewardType}</p>
-            </div>
-
-            <div className="col-md-6 mb-3">
-              <h6 className="text-muted">Status</h6>
-              <p className="fw-semibold text-uppercase">{achievement.status}</p>
-            </div>
+          <div style={{ marginBottom: "40px" }}>
+            <Label>Description</Label>
+            <p style={{ marginTop: "8px" }}>{achievement.description}</p>
           </div>
 
-          {/* Description */}
-          <div className="mt-4">
-            <h6 className="text-muted">Description</h6>
-            <p className="text-secondary">{achievement.description}</p>
-          </div>
+          {imageUrl && (
+            <div style={{ marginBottom: "50px" }}>
+              <Label>Evidence</Label>
+              <img
+                src={imageUrl}
+                alt="Evidence"
+                style={{
+                  width: "100%",
+                  maxHeight: "400px",
+                  objectFit: "cover",
+                  borderRadius: "16px",
+                  marginTop: "10px",
+                }}
+              />
+              <div style={{ marginTop: "15px" }}>
+                <a
+                  href={imageUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    color: "#f97316",
+                    fontWeight: 600,
+                    textDecoration: "none",
+                  }}
+                >
+                  View Full Image →
+                </a>
+              </div>
+            </div>
+          )}
 
-          {/* Proof */}
-          <div className="mt-4">
-            <h6 className="text-muted">Proof Document</h6>
+          <div
+            style={{ display: "flex", justifyContent: "flex-end", gap: "20px" }}
+          >
             <button
-              className="px-3 py-1 rounded-3 border fw-medium"
-              style={{
-                borderColor: "#f97316",
-                color: "#f97316",
-                backgroundColor: "transparent",
-              }}
-            >
-              View Certificate
-            </button>
-          </div>
-
-          <hr className="my-4" />
-
-          {/* Action Buttons */}
-          <div className="d-flex justify-content-end gap-3">
-            <button
-              onClick={() => openModal("accept")}
               disabled={achievement.status !== "pending"}
-              className="px-4 py-2 rounded-3 border-0 text-white fw-semibold"
+              onClick={() => openModal("accept")}
               style={{
+                padding: "12px 28px",
+                borderRadius: "999px",
+                border: "none",
                 backgroundColor: "#f97316",
-                opacity: achievement.status !== "pending" ? 0.5 : 1,
+                color: "#fff",
+                fontWeight: 600,
+                opacity: achievement.status !== "pending" ? 0.4 : 1,
+                cursor: "pointer",
               }}
             >
               Accept
             </button>
 
             <button
-              onClick={() => openModal("reject")}
               disabled={achievement.status !== "pending"}
-              className="px-4 py-2 rounded-3 border fw-semibold"
+              onClick={() => openModal("reject")}
               style={{
-                backgroundColor: "#f5f5f7",
-                color: "#1d1d1f",
-                borderColor: "#e5e5ea",
-                opacity: achievement.status !== "pending" ? 0.5 : 1,
+                padding: "12px 28px",
+                borderRadius: "999px",
+                border: "1px solid #d2d2d7",
+                backgroundColor: "#fff",
+                fontWeight: 600,
+                opacity: achievement.status !== "pending" ? 0.4 : 1,
+                cursor: "pointer",
               }}
             >
               Reject
@@ -186,62 +222,99 @@ export default function AchievementDetails() {
         </div>
       </div>
 
-      {/* Modal */}
       {showModal && (
         <div
-          className="modal fade show d-block"
-          style={{ backgroundColor: "rgba(0,0,0,0.25)" }}
+          style={{
+            position: "fixed",
+            inset: 0,
+            backdropFilter: "blur(8px)",
+            backgroundColor: "rgba(0,0,0,0.25)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 999,
+          }}
         >
-          <div className="modal-dialog modal-dialog-centered">
-            <div
-              className="modal-content border-0"
+          <div
+            style={{
+              background: "#ffffff",
+              borderRadius: "28px",
+              padding: "50px 40px",
+              width: "420px",
+              textAlign: "center",
+              boxShadow: "0 30px 60px rgba(0,0,0,0.15)",
+              animation: "fadeIn 0.2s ease-out",
+            }}
+          >
+            <h3
               style={{
-                borderRadius: "16px",
-                boxShadow: "0 10px 30px rgba(0,0,0,0.1)",
+                fontSize: "22px",
+                fontWeight: 600,
+                marginBottom: "16px",
+                color: "#1d1d1f",
               }}
             >
-              <div className="modal-header border-0">
-                <h5 className="modal-title fw-semibold">
-                  {actionType === "accept"
-                    ? "Confirm Acceptance"
-                    : "Confirm Rejection"}
-                </h5>
-                <button
-                  type="button"
-                  className="btn-close"
-                  onClick={closeModal}
-                ></button>
-              </div>
+              {actionType === "accept"
+                ? "Approve Submission?"
+                : "Reject Submission?"}
+            </h3>
 
-              <div className="modal-body pt-0">
-                <p className="text-muted">
-                  Are you sure you want to{" "}
-                  {actionType === "accept" ? "accept" : "reject"} this
-                  achievement?
-                </p>
-              </div>
+            <p
+              style={{
+                fontSize: "15px",
+                color: "#6e6e73",
+                marginBottom: "40px",
+                lineHeight: "1.6",
+              }}
+            >
+              This action cannot be undone. Are you sure you want to{" "}
+              {actionType === "accept" ? "approve" : "reject"} this achievement?
+            </p>
 
-              <div className="modal-footer border-0">
-                <button
-                  onClick={closeModal}
-                  className="px-4 py-2 rounded-3 border fw-semibold"
-                  style={{
-                    backgroundColor: "#f5f5f7",
-                    color: "#1d1d1f",
-                    borderColor: "#e5e5ea",
-                  }}
-                >
-                  Cancel
-                </button>
+            <div
+              style={{
+                display: "flex",
+                justifyContent: "center",
+                gap: "18px",
+              }}
+            >
+              <button
+                onClick={closeModal}
+                style={{
+                  padding: "12px 28px",
+                  borderRadius: "999px",
+                  border: "1px solid #d2d2d7",
+                  backgroundColor: "#ffffff",
+                  fontWeight: 600,
+                  fontSize: "14px",
+                  cursor: "pointer",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                Cancel
+              </button>
 
-                <button
-                  onClick={confirmAction}
-                  className="px-4 py-2 rounded-3 border-0 text-white fw-semibold"
-                  style={{ backgroundColor: "#f97316" }}
-                >
-                  Confirm
-                </button>
-              </div>
+              <button
+                onClick={confirmAction}
+                style={{
+                  padding: "12px 28px",
+                  borderRadius: "999px",
+                  border: "none",
+                  backgroundColor:
+                    actionType === "accept" ? "#f97316" : "#d93025",
+                  color: "#ffffff",
+                  fontWeight: 600,
+                  fontSize: "14px",
+                  cursor: "pointer",
+                  boxShadow:
+                    actionType === "accept"
+                      ? "0 6px 20px rgba(249,115,22,0.35)"
+                      : "0 6px 20px rgba(217,48,37,0.35)",
+                  transition: "all 0.2s ease",
+                }}
+              >
+                Confirm
+              </button>
             </div>
           </div>
         </div>
@@ -249,3 +322,16 @@ export default function AchievementDetails() {
     </>
   );
 }
+
+const Label = ({ children }) => (
+  <div style={{ fontSize: "13px", color: "#6e6e73", marginBottom: "6px" }}>
+    {children}
+  </div>
+);
+
+const Info = ({ label, value }) => (
+  <div>
+    <Label>{label}</Label>
+    <div style={{ fontSize: "16px", fontWeight: 500 }}>{value}</div>
+  </div>
+);
