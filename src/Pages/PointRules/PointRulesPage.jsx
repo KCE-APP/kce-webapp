@@ -4,6 +4,7 @@ import api from "../../api/axios";
 import PointRulesTable from "./PointRulesTable";
 import PointRulesForm from "./PointRulesForm";
 import Swal from "sweetalert2";
+import * as XLSX from "xlsx";
 
 export default function PointRulesPage() {
   const [activeTab, setActiveTab] = useState("list");
@@ -75,9 +76,30 @@ export default function PointRulesPage() {
 
   const handleExport = async () => {
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL;
-      const exportUrl = `${baseUrl}/rewards/export/rules?search=${searchTerm}`;
-      window.open(exportUrl, "_blank");
+      const res = await api.get("/rewards/rules", {
+        params: {
+          limit: 1000,
+          search: searchTerm,
+        },
+      });
+
+      const data = res.data.data || res.data;
+
+      if (!Array.isArray(data) || data.length === 0) {
+        Swal.fire("Info", "No point rules to export", "info");
+        return;
+      }
+
+      const worksheet = XLSX.utils.json_to_sheet(
+        data.map((item) => ({
+          Category: item.category,
+          Points: item.points,
+        })),
+      );
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Point Rules");
+      XLSX.writeFile(workbook, "point_rules.xlsx");
     } catch (error) {
       console.error("Export failed", error);
       Swal.fire("Error", "Failed to export point rules", "error");
