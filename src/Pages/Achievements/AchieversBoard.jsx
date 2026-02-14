@@ -19,6 +19,8 @@ export default function AchieverBoard({
   itemsPerPage,
   onLimitChange,
   totalCount,
+  filterCollege,
+  onFilterChange,
 }) {
   const navigate = useNavigate();
 
@@ -65,6 +67,32 @@ export default function AchieverBoard({
 
         {/* Actions Group */}
         <div className="d-flex align-items-center gap-3 w-100 w-lg-auto justify-content-end flex-wrap">
+          {/* Filter */}
+          <div className="d-flex align-items-center gap-2">
+            <span
+              className="text-muted small fw-bold d-none d-md-block"
+              style={{ fontSize: "0.75rem", letterSpacing: "0.05em" }}
+            >
+              COLLEGE:
+            </span>
+            <Form.Select
+              value={filterCollege}
+              onChange={(e) => onFilterChange(e.target.value)}
+              className="filter-select py-2 ps-3 pe-5"
+              style={{ width: "auto", minWidth: "140px" }}
+            >
+              <option value="">All Campuses</option>
+              <option value="KCE">KCE</option>
+              <option value="KIT">KIT</option>
+              <option value="KAHE">KAHE</option>
+            </Form.Select>
+          </div>
+
+          <div
+            className="vr h-100 mx-1 border-secondary opacity-25 d-none d-md-block"
+            style={{ minHeight: "24px" }}
+          ></div>
+
           {/* Result Counter */}
           <span className="text-muted small fw-bold text-uppercase">
             Showing {data.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}-

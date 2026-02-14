@@ -8,14 +8,40 @@ export default function AchieverBoardContainer() {
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
   const [itemsPerPage, setItemsPerPage] = useState(10);
+  const [filterCollege, setFilterCollege] = useState("");
+  const [totalCount, setTotalCount] = useState(0);
+  const [totalPages, setTotalPages] = useState(1);
 
   const fetchSubmission = useCallback(async () => {
     try {
       setLoading(true);
 
-      const res = await api.get("/rewards/submissions");
+      const res = await api.get("/rewards/submissions", {
+        params: {
+          page: currentPage,
+          limit: itemsPerPage,
+          search: searchTerm,
+          college: filterCollege,
+        },
+      });
 
-      const formatted = res.data.data.map((item) => ({
+      let fetchedData = [];
+      if (res.data && Array.isArray(res.data.data)) {
+        fetchedData = res.data.data;
+        setTotalPages(res.data.totalPages || 1);
+        setTotalCount(res.data.totalCount || res.data.data.length);
+      } else if (Array.isArray(res.data)) {
+        // Fallback for flat array response
+        fetchedData = res.data;
+        setTotalPages(1);
+        setTotalCount(res.data.length);
+      } else {
+         fetchedData = [];
+         setTotalPages(1);
+         setTotalCount(0);
+      }
+
+      const formatted = fetchedData.map((item) => ({
         ...item,
         _id: item.submissionId,
         rewardType: item.category,
@@ -31,32 +57,17 @@ export default function AchieverBoardContainer() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [currentPage, itemsPerPage, searchTerm, filterCollege]);
 
   useEffect(() => {
     fetchSubmission();
   }, [fetchSubmission]);
 
+  // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, itemsPerPage]);
+  }, [searchTerm, itemsPerPage, filterCollege]);
 
-  const filteredData = useMemo(() => {
-    const lowerSearch = searchTerm.toLowerCase();
-
-    return data.filter(
-      (student) =>
-        (student.name || "").toLowerCase().includes(lowerSearch) ||
-        (student.rollNo || "").toLowerCase().includes(lowerSearch),
-    );
-  }, [data, searchTerm]);
-
-  const totalPages = Math.ceil(filteredData.length / itemsPerPage);
-
-  const paginatedData = useMemo(() => {
-    const start = (currentPage - 1) * itemsPerPage;
-    return filteredData.slice(start, start + itemsPerPage);
-  }, [filteredData, currentPage, itemsPerPage]);
 
   const handleDelete = async (rollNo, submissionId) => {
     try {
@@ -70,7 +81,7 @@ export default function AchieverBoardContainer() {
 
   return (
     <AchieverBoard
-      data={paginatedData}
+      data={data}
       loading={loading}
       currentPage={currentPage}
       totalPages={totalPages}
@@ -80,7 +91,9 @@ export default function AchieverBoardContainer() {
       onDelete={handleDelete}
       itemsPerPage={itemsPerPage}
       onLimitChange={setItemsPerPage}
-      totalCount={filteredData.length}
+      totalCount={totalCount}
+      filterCollege={filterCollege}
+      onFilterChange={setFilterCollege}
     />
   );
 }
