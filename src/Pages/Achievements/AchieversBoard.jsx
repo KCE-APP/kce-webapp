@@ -16,6 +16,9 @@ export default function AchieverBoard({
   searchTerm,
   onSearchChange,
   onDelete,
+  itemsPerPage,
+  onLimitChange,
+  totalCount,
 }) {
   const navigate = useNavigate();
 
@@ -36,25 +39,19 @@ export default function AchieverBoard({
 
   return (
     <div className="px-4 px-lg-4 py-3">
-      <div className="d-flex justify-content-center mb-4">
-        <div className="position-relative w-100" style={{ maxWidth: "480px" }}>
-          <SearchIcon
-            style={{
-              position: "absolute",
-              top: "50%",
-              left: "16px",
-              transform: "translateY(-50%)",
-              fontSize: "20px",
-              color: "#f97316",
-              opacity: 0.7,
-            }}
-          />
-
+      {/* Professional Toolbar */}
+      <div className="toolbar-card d-flex flex-column flex-lg-row align-items-center justify-content-between gap-3 mb-4">
+        {/* Search Bar */}
+        <div className="position-relative w-100" style={{ maxWidth: "450px" }}>
+          <div className="position-absolute top-50 start-0 translate-middle-y ps-3 text-muted">
+            <SearchIcon style={{ fontSize: "20px" }} />
+          </div>
           <Form.Control
             type="text"
             placeholder="Search by student name or roll no"
             value={searchTerm}
             onChange={(e) => onSearchChange(e.target.value)}
+            className="search-input ps-5 py-2"
             style={{
               paddingLeft: "45px",
               paddingTop: "10px",
@@ -64,6 +61,42 @@ export default function AchieverBoard({
               fontSize: "0.9rem",
             }}
           />
+        </div>
+
+        {/* Actions Group */}
+        <div className="d-flex align-items-center gap-3 w-100 w-lg-auto justify-content-end flex-wrap">
+          {/* Result Counter */}
+          <span className="text-muted small fw-bold text-uppercase">
+            Showing {data.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}-
+            {Math.min(currentPage * itemsPerPage, totalCount)} of {totalCount}
+          </span>
+
+          <div
+            className="vr h-100 mx-1 border-secondary opacity-25 d-none d-md-block"
+            style={{ minHeight: "24px" }}
+          ></div>
+
+             {/* Limit Selector */}
+          <div className="d-flex align-items-center gap-2">
+            <span
+              className="text-muted small fw-bold d-none d-md-block"
+              style={{ fontSize: "0.75rem", letterSpacing: "0.05em" }}
+            >
+              LIMIT:
+            </span>
+
+            <Form.Select
+              value={itemsPerPage}
+              onChange={(e) => onLimitChange(Number(e.target.value))}
+              className="filter-select py-2 ps-3 pe-5"
+              style={{ width: "auto", minWidth: "100px" }}
+            >
+              <option value="10">10</option>
+              <option value="50">50</option>
+              <option value="100">100</option>
+              <option value="1000">All</option>
+            </Form.Select>
+          </div>
         </div>
       </div>
 
@@ -164,7 +197,7 @@ export default function AchieverBoard({
                             className="text-danger"
                             onClick={(e) => {
                               e.stopPropagation();
-                              onDelete(student._id);
+                              onDelete(student.rollNo, student.submissionId);
                             }}
                           >
                             <DeleteIcon fontSize="small" />

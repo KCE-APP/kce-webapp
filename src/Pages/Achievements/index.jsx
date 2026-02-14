@@ -7,8 +7,7 @@ export default function AchieverBoardContainer() {
   const [loading, setLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [currentPage, setCurrentPage] = useState(1);
-
-  const itemsPerPage = 10;
+  const [itemsPerPage, setItemsPerPage] = useState(10);
 
   const fetchSubmission = useCallback(async () => {
     try {
@@ -40,7 +39,7 @@ export default function AchieverBoardContainer() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm]);
+  }, [searchTerm, itemsPerPage]);
 
   const filteredData = useMemo(() => {
     const lowerSearch = searchTerm.toLowerCase();
@@ -57,11 +56,12 @@ export default function AchieverBoardContainer() {
   const paginatedData = useMemo(() => {
     const start = (currentPage - 1) * itemsPerPage;
     return filteredData.slice(start, start + itemsPerPage);
-  }, [filteredData, currentPage]);
+  }, [filteredData, currentPage, itemsPerPage]);
 
-  const handleDelete = async (id) => {
+  const handleDelete = async (rollNo, submissionId) => {
     try {
-      const updated = data.filter((student) => student._id !== id);
+      await api.delete(`/rewards/submission/${submissionId}`);
+      const updated = data.filter((student) => student.rollNo !== rollNo);
       setData(updated);
     } catch (error) {
       console.error("Delete failed:", error);
@@ -78,6 +78,9 @@ export default function AchieverBoardContainer() {
       searchTerm={searchTerm}
       onSearchChange={setSearchTerm}
       onDelete={handleDelete}
+      itemsPerPage={itemsPerPage}
+      onLimitChange={setItemsPerPage}
+      totalCount={filteredData.length}
     />
   );
 }
