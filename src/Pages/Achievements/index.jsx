@@ -115,6 +115,7 @@ export default function AchieverBoardContainer() {
       setData(updated);
     } catch (error) {
       console.error("Delete failed:", error);
+      throw error;
     }
   };
 

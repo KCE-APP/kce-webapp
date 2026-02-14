@@ -3,6 +3,7 @@ import { Container, Nav } from "react-bootstrap";
 import api from "../../api/axios";
 import UsersTable from "./UsersTable";
 import Swal from "sweetalert2";
+import * as XLSX from "xlsx";
 //import "./users.css";
 
 export default function UsersPage() {
@@ -135,12 +136,42 @@ export default function UsersPage() {
     setEditingItem(null);
   };
 
-  const handleExport = () => {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL;
-    window.open(
-      `${baseUrl}/users/export?search=${searchTerm}&college=${filterCollege}`,
-      "_blank",
-    );
+  const handleExport = async () => {
+    try {
+      const res = await api.get("/users", {
+        params: {
+          limit: 1000,
+          search: searchTerm,
+          college: filterCollege,
+        },
+      });
+
+      const data = res.data.users || res.data;
+
+      if (!Array.isArray(data) || data.length === 0) {
+        Swal.fire("Info", "No users to export", "info");
+        return;
+      }
+
+      const worksheet = XLSX.utils.json_to_sheet(
+        data.map((user) => ({
+          Name: user.name,
+          Email: user.email,
+          Roll_No: user.rollNo,
+          Batch: user.batch,
+          Department: user.department,
+          College: user.collegeName,
+          Role: user.role,
+        })),
+      );
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Users");
+      XLSX.writeFile(workbook, "users_report.xlsx");
+    } catch (error) {
+      console.error("Export failed", error);
+      Swal.fire("Error", "Failed to export users", "error");
+    }
   };
 
   return (

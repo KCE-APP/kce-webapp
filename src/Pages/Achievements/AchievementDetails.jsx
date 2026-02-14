@@ -41,21 +41,26 @@ export default function AchievementDetails() {
     try {
       setProcessing(true);
 
-      const statusValue = actionType === "accept" ? "approved" : "rejected";
-      const payload = {
-        status: statusValue,
-      };
+      if (actionType === "delete") {
+        await api.delete(`/rewards/submission/${achievementInfo}`);
+        // No achievement update needed for delete as we will redirect
+      } else {
+        const statusValue = actionType === "accept" ? "approved" : "rejected";
+        const payload = {
+          status: statusValue,
+        };
 
-      if (actionType === "reject") {
-        payload.reason = rejectionReason;
+        if (actionType === "reject") {
+          payload.reason = rejectionReason;
+        }
+
+        await api.patch(`/rewards/verify/${achievementInfo}`, payload);
+
+        setAchievement((prev) => ({
+          ...prev,
+          status: statusValue,
+        }));
       }
-
-      await api.patch(`/rewards/verify/${achievementInfo}`, payload);
-
-      setAchievement((prev) => ({
-        ...prev,
-        status: statusValue,
-      }));
 
       setApiSuccess(true);
     } catch (error) {
@@ -262,6 +267,22 @@ export default function AchievementDetails() {
             >
               Reject
             </button>
+
+
+            <button
+              onClick={() => openModal("delete")}
+              style={{
+                padding: "12px 28px",
+                borderRadius: "999px",
+                border: "none",
+                backgroundColor: "#d93025",
+                color: "#fff",
+                fontWeight: 600,
+                cursor: "pointer",
+              }}
+            >
+              Delete
+            </button>
           </div>
         </div>
       </div>
@@ -301,7 +322,9 @@ export default function AchievementDetails() {
                 >
                   {actionType === "accept"
                     ? "Approve Submission?"
-                    : "Reject Submission?"}
+                    : actionType === "reject"
+                    ? "Reject Submission?"
+                    : "Delete Submission?"}
                 </h3>
 
                 <p
@@ -313,8 +336,12 @@ export default function AchievementDetails() {
                   }}
                 >
                   Are you sure you want to{" "}
-                  {actionType === "accept" ? "approve" : "reject"} this
-                  submission?
+                  {actionType === "accept"
+                    ? "approve"
+                    : actionType === "reject"
+                    ? "reject"
+                    : "delete"}{" "}
+                  this submission?
                 </p>
 
                 {actionType === "reject" && (
@@ -367,7 +394,9 @@ export default function AchievementDetails() {
                       borderRadius: "999px",
                       border: "none",
                       backgroundColor:
-                        actionType === "accept" ? "#f97316" : "#d93025",
+                        actionType === "accept"
+                          ? "#f97316"
+                          : "#d93025",
                       color: "#ffffff",
                       fontWeight: 600,
                       fontSize: "14px",
@@ -399,7 +428,7 @@ export default function AchievementDetails() {
                     marginBottom: "40px",
                   }}
                 >
-                  Submission has been {achievement.status.toUpperCase()}{" "}
+                  Submission has been {actionType === "delete" ? "DELETED" : achievement.status.toUpperCase()}{" "}
                   successfully.
                 </p>
 
