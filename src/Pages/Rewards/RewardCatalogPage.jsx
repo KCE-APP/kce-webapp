@@ -4,6 +4,7 @@ import api from "../../api/axios";
 import RewardCatalogTable from "./RewardCatalogTable";
 import RewardCatalogForm from "./RewardCatalogForm";
 import Swal from "sweetalert2";
+import * as XLSX from "xlsx";
 
 export default function RewardCatalogPage() {
   const [activeTab, setActiveTab] = useState("list");
@@ -75,9 +76,34 @@ export default function RewardCatalogPage() {
 
   const handleExport = async () => {
     try {
-      const baseUrl = import.meta.env.VITE_API_BASE_URL;
-      const exportUrl = `${baseUrl}/rewards/export/catalog?search=${searchTerm}`;
-      window.open(exportUrl, "_blank");
+      const res = await api.get("/rewards/catalog", {
+        params: {
+          limit: 1000,
+          search: searchTerm,
+        },
+      });
+
+      const data = res.data.data || res.data;
+
+      if (!Array.isArray(data) || data.length === 0) {
+        Swal.fire("Info", "No rewards to export", "info");
+        return;
+      }
+
+      const worksheet = XLSX.utils.json_to_sheet(
+        data.map((item) => ({
+          Name: item.name,
+          Points_Cost: item.pointsCost,
+          Category: item.category,
+          Stock: item.stock,
+          Status: item.isActive ? "Active" : "Inactive",
+          Description: item.description,
+        })),
+      );
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Rewards");
+      XLSX.writeFile(workbook, "rewards_catalog.xlsx");
     } catch (error) {
       console.error("Export failed", error);
       Swal.fire("Error", "Failed to export reward catalog", "error");

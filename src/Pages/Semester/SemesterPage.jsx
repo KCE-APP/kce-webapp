@@ -14,6 +14,7 @@ export default function SemesterPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterCollege, setFilterCollege] = useState("");
 
   // Dirty State Logic
   const [isDirty, setIsDirty] = useState(false);
@@ -31,6 +32,7 @@ export default function SemesterPage() {
           page: currentPage,
           limit: 10,
           search: searchTerm,
+          college: filterCollege,
         },
       });
 
@@ -56,7 +58,7 @@ export default function SemesterPage() {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [currentPage, searchTerm]);
+  }, [currentPage, searchTerm, filterCollege]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -64,6 +66,11 @@ export default function SemesterPage() {
 
   const handleSearchChange = (term) => {
     setSearchTerm(term);
+    setCurrentPage(1);
+  };
+
+  const handleFilterChange = (val) => {
+    setFilterCollege(val);
     setCurrentPage(1);
   };
 
@@ -212,6 +219,8 @@ export default function SemesterPage() {
           onPageChange={handlePageChange}
           searchTerm={searchTerm}
           onSearchChange={handleSearchChange}
+          filterCollege={filterCollege}
+          onFilterChange={handleFilterChange}
         />
       )}
 

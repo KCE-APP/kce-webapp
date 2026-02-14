@@ -3,9 +3,10 @@ import { Container, Nav } from "react-bootstrap";
 import api from "../../api/axios";
 import RedemptionHistoryTable from "./RedemptionHistoryTable";
 import Swal from "sweetalert2";
+import * as XLSX from "xlsx";
 
 export default function RedemptionHistoryPage() {
-  const [activeTab, setActiveTab] = useState("list");
+  const [activeTab, setActiveTab] = useState("pending");
   const [data, setData] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -13,6 +14,7 @@ export default function RedemptionHistoryPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
+  const [filterCollege, setFilterCollege] = useState("");
   const [limit, setLimit] = useState(10);
 
   const loadData = async () => {
@@ -23,6 +25,8 @@ export default function RedemptionHistoryPage() {
           page: currentPage,
           limit: limit,
           search: searchTerm,
+          status: activeTab, // "pending" or "fulfilled"
+          college: filterCollege,
         },
       });
 
@@ -47,7 +51,7 @@ export default function RedemptionHistoryPage() {
     }, 500);
 
     return () => clearTimeout(timer);
-  }, [currentPage, searchTerm, limit]);
+  }, [currentPage, searchTerm, limit, activeTab, filterCollege]);
 
   const handlePageChange = (page) => {
     setCurrentPage(page);
@@ -60,6 +64,11 @@ export default function RedemptionHistoryPage() {
 
   const handleLimitChange = (newLimit) => {
     setLimit(Number(newLimit));
+    setCurrentPage(1);
+  };
+
+  const handleFilterChange = (val) => {
+    setFilterCollege(val);
     setCurrentPage(1);
   };
 
@@ -83,12 +92,48 @@ export default function RedemptionHistoryPage() {
     }
   };
 
-  const handleExport = () => {
-    const baseUrl = import.meta.env.VITE_API_BASE_URL;
-    window.open(
-      `${baseUrl}/rewards/export/redemptions?search=${searchTerm}`,
-      "_blank",
-    );
+  const handleExport = async () => {
+    try {
+      const res = await api.get("/rewards/admin/redemptions", {
+        params: {
+          limit: 1000,
+          search: searchTerm,
+          status: activeTab,
+          college: filterCollege,
+        },
+      });
+
+      const data = res.data.data || res.data; // Handle potential different response structures
+
+      if (!Array.isArray(data) || data.length === 0) {
+        Swal.fire("Info", "No data to export", "info");
+        return;
+      }
+
+      const worksheet = XLSX.utils.json_to_sheet(
+        data.map((item) => ({
+          Student_Name: item.studentId?.name || "N/A",
+          Roll_No: item.studentId?.rollNo || "N/A",
+          Department: item.studentId?.department || "N/A",
+          Batch: item.studentId?.batch || "N/A",
+          College: item.studentId?.collegeName || "N/A",
+          Reward_Name: item.rewardId?.name || "N/A",
+          Category: item.rewardId?.category || "N/A",
+          Points_Cost: item.rewardId?.pointsCost || 0,
+          Status: item.status,
+          Redeemed_At: item.redeemedAt
+            ? new Date(item.redeemedAt).toLocaleDateString()
+            : "",
+        })),
+      );
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Redemptions");
+      XLSX.writeFile(workbook, "redemption_history.xlsx");
+    } catch (error) {
+      console.error("Export failed", error);
+      Swal.fire("Error", "Failed to export data", "error");
+    }
   };
 
   return (
@@ -106,30 +151,39 @@ export default function RedemptionHistoryPage() {
         variant="pills"
         className="modern-tabs mb-4"
         activeKey={activeTab}
-        onSelect={setActiveTab}
+        onSelect={(k) => {
+          setActiveTab(k);
+          setCurrentPage(1); // Reset page on tab change
+        }}
       >
         <Nav.Item>
-          <Nav.Link eventKey="list" className="px-4">
-            View All
+          <Nav.Link eventKey="pending" className="px-4">
+            Pending Requests
+          </Nav.Link>
+        </Nav.Item>
+        <Nav.Item>
+          <Nav.Link eventKey="fulfilled" className="px-4">
+            Fulfilled History
           </Nav.Link>
         </Nav.Item>
       </Nav>
 
-      {activeTab === "list" && (
-        <RedemptionHistoryTable
-          data={data}
-          loading={loading}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={handlePageChange}
-          searchTerm={searchTerm}
-          onSearchChange={handleSearchChange}
-          limit={limit}
-          onLimitChange={handleLimitChange}
-          onExport={handleExport}
-          onFulfill={handleFulfill}
-        />
-      )}
+      <RedemptionHistoryTable
+        data={data}
+        loading={loading}
+        currentPage={currentPage}
+        totalPages={totalPages}
+        onPageChange={handlePageChange}
+        searchTerm={searchTerm}
+        onSearchChange={handleSearchChange}
+        filterCollege={filterCollege}
+        onFilterChange={handleFilterChange}
+        limit={limit}
+        onLimitChange={handleLimitChange}
+        onExport={handleExport}
+        onFulfill={handleFulfill}
+        activeTab={activeTab}
+      />
     </Container>
   );
 }

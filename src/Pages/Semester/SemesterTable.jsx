@@ -16,6 +16,8 @@ export default function SemesterTable({
   onPageChange,
   searchTerm,
   onSearchChange,
+  filterCollege,
+  onFilterChange,
 }) {
   const handleDeleteClick = (id, batch, sem) => {
     Swal.fire({
@@ -61,6 +63,21 @@ export default function SemesterTable({
             onChange={(e) => onSearchChange(e.target.value)}
             className="search-input ps-5 py-2"
           />
+        </div>
+
+        <div className="d-flex align-items-center gap-2">
+          <span className="toolbar-label">CAMPUS:</span>
+          <Form.Select
+            value={filterCollege}
+            onChange={(e) => onFilterChange(e.target.value)}
+            className="filter-select"
+            style={{ width: "auto", minWidth: "150px" }}
+          >
+            <option value="">All Campuses</option>
+            <option value="KCE">KCE</option>
+            <option value="KIT">KIT</option>
+            <option value="KAHE">KAHE</option>
+          </Form.Select>
         </div>
       </div>
 
