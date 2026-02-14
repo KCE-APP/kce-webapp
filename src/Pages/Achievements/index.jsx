@@ -1,4 +1,4 @@
-import React, { useState, useMemo, useEffect, useCallback } from "react";
+import React, { useState, useEffect, useCallback } from "react";
 import AchieverBoard from "./AchieversBoard";
 import api from "../../api/axios";
 
@@ -21,7 +21,7 @@ export default function AchieverBoardContainer() {
           page: currentPage,
           limit: itemsPerPage,
           search: searchTerm,
-          college: filterCollege,
+          collegeName: filterCollege,
         },
       });
 
@@ -63,11 +63,50 @@ export default function AchieverBoardContainer() {
     fetchSubmission();
   }, [fetchSubmission]);
 
-  // Reset page when filters change
   useEffect(() => {
     setCurrentPage(1);
   }, [searchTerm, itemsPerPage, filterCollege]);
 
+  const handleExportExcel = async () => {
+    try {
+      const res = await api.get("/rewards/submissions", {
+        params: {
+          limit: 1000,
+          search: searchTerm,
+          collegeName: filterCollege,
+        },
+      });
+      const exportData = res.data.data || res.data;
+
+      // Dynamic import to avoid initial bundle size increase if not needed
+      const XLSX = await import("xlsx");
+
+      const worksheet = XLSX.utils.json_to_sheet(
+        exportData.map((item) => ({
+          Name: item.name,
+          RollNo: item.rollNo,
+          College: item.college,
+          Batch: item.batch,
+          Department: item.department,
+          Category: item.category,
+          Title: item.title,
+          Description: item.description,
+          Status: item.status
+            ? item.status.charAt(0).toUpperCase() + item.status.slice(1)
+            : "Pending",
+          SubmissionDate: item.createdAt
+            ? new Date(item.createdAt).toLocaleDateString()
+            : "",
+        })),
+      );
+
+      const workbook = XLSX.utils.book_new();
+      XLSX.utils.book_append_sheet(workbook, worksheet, "Submissions");
+      XLSX.writeFile(workbook, "Reward_Submissions.xlsx");
+    } catch (error) {
+      console.error("Excel export failed", error);
+    }
+  };
 
   const handleDelete = async (rollNo, submissionId) => {
     try {
@@ -94,6 +133,7 @@ export default function AchieverBoardContainer() {
       totalCount={totalCount}
       filterCollege={filterCollege}
       onFilterChange={setFilterCollege}
+      onExportExcel={handleExportExcel}
     />
   );
 }

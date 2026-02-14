@@ -5,6 +5,7 @@ import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import SearchIcon from "@mui/icons-material/Search";
 import EmojiEventsIcon from "@mui/icons-material/EmojiEventsOutlined";
 import FilterListIcon from "@mui/icons-material/FilterList";
+import FileDownloadIcon from "@mui/icons-material/FileDownloadOutlined";
 import AchieverBoardPlaceholder from "../../component/AchieversListTablePlaceholder";
 
 export default function AchieverBoard({
@@ -21,6 +22,7 @@ export default function AchieverBoard({
   totalCount,
   filterCollege,
   onFilterChange,
+  onExportExcel,
 }) {
   const navigate = useNavigate();
 
@@ -125,6 +127,20 @@ export default function AchieverBoard({
               <option value="1000">All</option>
             </Form.Select>
           </div>
+
+          <button
+            onClick={onExportExcel}
+            className="d-flex align-items-center gap-2 px-3 py-2 rounded-3 border-0 bg-success bg-opacity-10 text-success fw-bold transition-all"
+            style={{ fontSize: "0.85rem", cursor: "pointer" }}
+            onMouseOver={(e) =>
+              (e.currentTarget.style.backgroundColor = "rgba(25, 135, 84, 0.2)")
+            }
+            onMouseOut={(e) =>
+              (e.currentTarget.style.backgroundColor = "rgba(25, 135, 84, 0.1)")
+            }
+          >
+            <FileDownloadIcon fontSize="small" /> <span>Excel</span>
+          </button>
         </div>
       </div>
 
