@@ -175,7 +175,7 @@ export default function UsersPage() {
   };
 
   return (
-    <Container className="py-4">
+    <div className="py-4 ps-3">
       <div className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
         <div>
           <h2 className="fw-bold color2 mb-0">User Management</h2>
@@ -235,6 +235,6 @@ export default function UsersPage() {
           onCancel={handleCancel}
         />
       )}
-    </Container>
+    </div>
   );
 }
