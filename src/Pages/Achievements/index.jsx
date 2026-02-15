@@ -11,10 +11,14 @@ export default function AchieverBoardContainer() {
   const [filterCollege, setFilterCollege] = useState("");
   const [totalCount, setTotalCount] = useState(0);
   const [totalPages, setTotalPages] = useState(1);
+  const [activeTab, setActiveTab] = useState("pending");
+  const [historyFilter, setHistoryFilter] = useState("approved");
 
   const fetchSubmission = useCallback(async () => {
     try {
       setLoading(true);
+
+      const statusParam = activeTab === "pending" ? "pending" : historyFilter;
 
       const res = await api.get("/rewards/submissions", {
         params: {
@@ -22,6 +26,7 @@ export default function AchieverBoardContainer() {
           limit: itemsPerPage,
           search: searchTerm,
           collegeName: filterCollege,
+          status: statusParam,
         },
       });
 
@@ -57,7 +62,7 @@ export default function AchieverBoardContainer() {
     } finally {
       setLoading(false);
     }
-  }, [currentPage, itemsPerPage, searchTerm, filterCollege]);
+  }, [currentPage, itemsPerPage, searchTerm, filterCollege, activeTab, historyFilter]);
 
   useEffect(() => {
     fetchSubmission();
@@ -65,7 +70,7 @@ export default function AchieverBoardContainer() {
 
   useEffect(() => {
     setCurrentPage(1);
-  }, [searchTerm, itemsPerPage, filterCollege]);
+  }, [searchTerm, itemsPerPage, filterCollege, activeTab, historyFilter]);
 
   const handleExportExcel = async () => {
     try {
@@ -135,6 +140,10 @@ export default function AchieverBoardContainer() {
       filterCollege={filterCollege}
       onFilterChange={setFilterCollege}
       onExportExcel={handleExportExcel}
+      activeTab={activeTab}
+      onTabChange={setActiveTab}
+      historyFilter={historyFilter}
+      onHistoryFilterChange={setHistoryFilter}
     />
   );
 }
