@@ -15,6 +15,13 @@ const LoginPage = () => {
   const location = useLocation();
 
   React.useEffect(() => {
+    // Check if user is already logged in
+    const token = localStorage.getItem("token");
+    if (token) {
+      navigate("/achievers", { replace: true });
+      return;
+    }
+
     const params = new URLSearchParams(location.search);
     if (params.get("sessionExpired")) {
       const Toast = Swal.mixin({
@@ -38,7 +45,7 @@ const LoginPage = () => {
       // Clean URL
       window.history.replaceState({}, document.title, window.location.pathname);
     }
-  }, [location]);
+  }, [location, navigate]);
 
   const validateForm = () => {
     const newErrors = {};
@@ -94,7 +101,7 @@ const LoginPage = () => {
             title: "Signed in successfully",
           });
 
-          navigate("/achievers");
+          navigate("/achievers", { replace: true });
         } else {
           console.error(
             "Login successful but no token found in response:",

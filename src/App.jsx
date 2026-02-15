@@ -28,7 +28,7 @@ function MainLayout() {
         <main className="page-content-wrapper">
           <Routes>
             {/* Shared Routes (Admin & Instructor) */}
-            <Route element={<ProtectedRoute allowedRoles={["admin", "instructor"]} />}>
+            <Route element={<ProtectedRoute allowedRoles={["admin", "instructor", "staff"]} />}>
               <Route path="/" element={<AchieversPage />} />
               <Route path="/achievers" element={<AchieversPage />} />
               <Route path="/events" element={<EventsPage />} />
@@ -70,7 +70,7 @@ function App() {
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
         {/* Protected Routes (Accessible by 'user' and 'admin') */}
-        <Route element={<ProtectedRoute allowedRoles={["user", "admin", "instructor"]} />}>
+        <Route element={<ProtectedRoute allowedRoles={["user", "admin", "instructor", "staff"]} />}>
           <Route path="/*" element={<MainLayout />} />
         </Route>
       </Routes>

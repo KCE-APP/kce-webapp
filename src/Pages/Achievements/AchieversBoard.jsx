@@ -23,6 +23,10 @@ export default function AchieverBoard({
   filterCollege,
   onFilterChange,
   onExportExcel,
+  activeTab,
+  onTabChange,
+  historyFilter,
+  onHistoryFilterChange,
 }) {
   const navigate = useNavigate();
   const [showModal, setShowModal] = useState(false);
@@ -73,6 +77,51 @@ export default function AchieverBoard({
 
   return (
     <div className="px-4 px-lg-4 py-3">
+      {/* Tabs */}
+      {/* Tabs */}
+      <div className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
+        <div>
+          <h2 className="fw-bold color2 mb-0">Submissions Management</h2>
+          <p className="text-muted small mb-0">
+           Manage submissions
+           </p>
+        </div>
+      </div>
+      <div className="d-flex gap-3 mb-4">
+        <button
+          onClick={() => onTabChange("pending")}
+          style={{
+            padding: "10px 24px",
+            borderRadius: "5px",
+            border: "none",
+            fontWeight: "600",
+            fontSize: "14px",
+            transition: "all 0.2s ease",
+            backgroundColor: activeTab === "pending" ? "#f97316" : "transparent",
+            color: activeTab === "pending" ? "#ffffff" : "#6e6e73",
+            boxShadow: activeTab === "pending" ? "0 4px 12px rgba(249, 115, 22, 0.2)" : "none",
+          }}
+        >
+          Pending Requests
+        </button>
+        <button
+          onClick={() => onTabChange("history")}
+          style={{
+            padding: "10px 24px",
+            borderRadius: "5px",
+            border: "none",
+            fontWeight: "600",
+            fontSize: "14px",
+            transition: "all 0.2s ease",
+            backgroundColor: activeTab === "history" ? "#f97316" : "transparent",
+            color: activeTab === "history" ? "#ffffff" : "#6e6e73",
+            boxShadow: activeTab === "history" ? "0 4px 12px rgba(249, 115, 22, 0.2)" : "none",
+          }}
+        >
+          Request History
+        </button>
+      </div>
+
       {/* Professional Toolbar */}
       <div className="toolbar-card d-flex flex-column flex-lg-row align-items-center justify-content-between gap-3 mb-4">
         {/* Search Bar */}
@@ -99,6 +148,33 @@ export default function AchieverBoard({
 
         {/* Actions Group */}
         <div className="d-flex align-items-center gap-3 w-100 w-lg-auto justify-content-end flex-wrap">
+          {/* History Filter - Only visible in History Tab */}
+          {activeTab === "history" && (
+            <>
+              <div className="d-flex align-items-center gap-2">
+                <span
+                  className="text-muted small fw-bold d-none d-md-block"
+                  style={{ fontSize: "0.75rem", letterSpacing: "0.05em" }}
+                >
+                  STATUS:
+                </span>
+                <Form.Select
+                  value={historyFilter}
+                  onChange={(e) => onHistoryFilterChange(e.target.value)}
+                  className="filter-select py-2 ps-3 pe-5"
+                  style={{ width: "auto", minWidth: "140px" }}
+                >
+                  <option value="approved">Approved</option>
+                  <option value="rejected">Rejected</option>
+                </Form.Select>
+              </div>
+              <div
+                className="vr h-100 mx-1 border-secondary opacity-25 d-none d-md-block"
+                style={{ minHeight: "24px" }}
+              ></div>
+            </>
+          )}
+
           {/* Filter */}
           <div className="d-flex align-items-center gap-2">
             <span
@@ -120,16 +196,16 @@ export default function AchieverBoard({
             </Form.Select>
           </div>
 
-          <div
+          {/* <div
             className="vr h-100 mx-1 border-secondary opacity-25 d-none d-md-block"
             style={{ minHeight: "24px" }}
-          ></div>
+          ></div> */}
 
           {/* Result Counter */}
-          <span className="text-muted small fw-bold text-uppercase">
+          {/* <span className="text-muted small fw-bold text-uppercase">
             Showing {data.length > 0 ? (currentPage - 1) * itemsPerPage + 1 : 0}-
             {Math.min(currentPage * itemsPerPage, totalCount)} of {totalCount}
-          </span>
+          </span> */}
 
           <div
             className="vr h-100 mx-1 border-secondary opacity-25 d-none d-md-block"
