@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import { Table, Button, Form, Pagination } from "react-bootstrap";
 import { useNavigate } from "react-router-dom";
 import DeleteIcon from "@mui/icons-material/DeleteOutline";
@@ -25,6 +25,36 @@ export default function AchieverBoard({
   onExportExcel,
 }) {
   const navigate = useNavigate();
+  const [showModal, setShowModal] = useState(false);
+  const [selectedItem, setSelectedItem] = useState(null);
+  const [processing, setProcessing] = useState(false);
+  const [deleteSuccess, setDeleteSuccess] = useState(false);
+
+  const openDeleteModal = (e, item) => {
+    e.stopPropagation();
+    setSelectedItem(item);
+    setShowModal(true);
+    setDeleteSuccess(false);
+  };
+
+  const closeDeleteModal = () => {
+    setShowModal(false);
+    setSelectedItem(null);
+    setDeleteSuccess(false);
+  };
+
+  const confirmDelete = async () => {
+    if (!selectedItem) return;
+    try {
+      setProcessing(true);
+      await onDelete(selectedItem.rollNo, selectedItem.submissionId);
+      setDeleteSuccess(true);
+    } catch (error) {
+      console.error("Delete failed in board", error);
+    } finally {
+      setProcessing(false);
+    }
+  };
 
   const rewardStyles = {
     "certification completion": { bg: "#eef2ff", text: "#4338ca" },
@@ -239,10 +269,7 @@ export default function AchieverBoard({
                             variant="light"
                             size="sm"
                             className="text-danger"
-                            onClick={(e) => {
-                              e.stopPropagation();
-                              onDelete(student.rollNo, student.submissionId);
-                            }}
+                            onClick={(e) => openDeleteModal(e, student)}
                           >
                             <DeleteIcon fontSize="small" />
                           </Button>
@@ -296,6 +323,144 @@ export default function AchieverBoard({
             </div>
           )}
         </>
+      )}
+      {showModal && (
+        <div
+          style={{
+            position: "fixed",
+            inset: 0,
+            backdropFilter: "blur(8px)",
+            backgroundColor: "rgba(0,0,0,0.25)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 999,
+          }}
+          onClick={(e) => e.stopPropagation()}
+        >
+          <div
+            style={{
+              background: "#ffffff",
+              borderRadius: "28px",
+              padding: "50px 40px",
+              width: "420px",
+              textAlign: "center",
+              boxShadow: "0 30px 60px rgba(0,0,0,0.15)",
+            }}
+            onClick={(e) => e.stopPropagation()}
+          >
+            {!deleteSuccess ? (
+              <>
+                <h3
+                  style={{
+                    fontSize: "22px",
+                    fontWeight: 600,
+                    marginBottom: "16px",
+                    color: "#1d1d1f",
+                  }}
+                >
+                  Delete Submission?
+                </h3>
+
+                <p
+                  style={{
+                    fontSize: "15px",
+                    color: "#6e6e73",
+                    marginBottom: "40px",
+                    lineHeight: "1.6",
+                  }}
+                >
+                  Are you sure you want to delete this submission for{" "}
+                  <span style={{ fontWeight: 600, color: "#1d1d1f" }}>
+                    {selectedItem?.name}
+                  </span>
+                  ?
+                </p>
+
+                <div
+                  style={{
+                    display: "flex",
+                    justifyContent: "center",
+                    gap: "18px",
+                  }}
+                >
+                  <button
+                    onClick={closeDeleteModal}
+                    disabled={processing}
+                    style={{
+                      padding: "12px 28px",
+                      borderRadius: "999px",
+                      border: "1px solid #d2d2d7",
+                      backgroundColor: "#ffffff",
+                      fontWeight: 600,
+                      fontSize: "14px",
+                      cursor: "pointer",
+                    }}
+                  >
+                    Cancel
+                  </button>
+
+                  <button
+                    onClick={confirmDelete}
+                    disabled={processing}
+                    style={{
+                      padding: "12px 28px",
+                      borderRadius: "999px",
+                      border: "none",
+                      backgroundColor: "#d93025",
+                      color: "#ffffff",
+                      fontWeight: 600,
+                      fontSize: "14px",
+                      cursor: "pointer",
+                      opacity: processing ? 0.6 : 1,
+                    }}
+                  >
+                    {processing ? "Processing..." : "Confirm"}
+                  </button>
+                </div>
+              </>
+            ) : (
+              <>
+                <h3
+                  style={{
+                    fontSize: "22px",
+                    fontWeight: 600,
+                    marginBottom: "16px",
+                    color: "#1d1d1f",
+                  }}
+                >
+                  Success 🎉
+                </h3>
+
+                <p
+                  style={{
+                    fontSize: "15px",
+                    color: "#6e6e73",
+                    marginBottom: "40px",
+                  }}
+                >
+                  Submission has been DELETED successfully.
+                </p>
+
+                <button
+                  onClick={closeDeleteModal}
+                  style={{
+                    padding: "12px 28px",
+                    borderRadius: "999px",
+                    border: "none",
+                    backgroundColor: "#f97316",
+                    color: "#ffffff",
+                    fontWeight: 600,
+                    fontSize: "14px",
+                    cursor: "pointer",
+                  }}
+                >
+                  Close
+                </button>
+              </>
+            )}
+          </div>
+        </div>
       )}
     </div>
   );
