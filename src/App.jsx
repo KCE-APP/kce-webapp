@@ -27,7 +27,8 @@ function MainLayout() {
         <Sidebar />
         <main className="page-content-wrapper">
           <Routes>
-            <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+            {/* Shared Routes (Admin & Instructor) */}
+            <Route element={<ProtectedRoute allowedRoles={["admin", "instructor"]} />}>
               <Route path="/" element={<AchieversPage />} />
               <Route path="/achievers" element={<AchieversPage />} />
               <Route path="/events" element={<EventsPage />} />
@@ -40,17 +41,19 @@ function MainLayout() {
                 path="/achieve-management/:achievementInfo"
                 element={<AchievementDetails />}
               />
-              {/* Admin Only Route */}
-
               <Route path="/users" element={<UsersPage />} />
-              <Route path="/point-rules" element={<PointRulesPage />} />
-              <Route path="/staff" element={<StaffPage />} />
-              <Route path="/semester" element={<SemesterPage />} />
-              <Route path="/reward-catalog" element={<RewardCatalogPage />} />
               <Route
                 path="/redemption-history"
                 element={<RedemptionHistoryPage />}
               />
+            </Route>
+
+            {/* Admin Only Routes */}
+            <Route element={<ProtectedRoute allowedRoles={["admin"]} />}>
+              <Route path="/point-rules" element={<PointRulesPage />} />
+              <Route path="/staff" element={<StaffPage />} />
+              <Route path="/semester" element={<SemesterPage />} />
+              <Route path="/reward-catalog" element={<RewardCatalogPage />} />
             </Route>
           </Routes>
         </main>
@@ -67,7 +70,7 @@ function App() {
         <Route path="/unauthorized" element={<UnauthorizedPage />} />
 
         {/* Protected Routes (Accessible by 'user' and 'admin') */}
-        <Route element={<ProtectedRoute allowedRoles={["user", "admin"]} />}>
+        <Route element={<ProtectedRoute allowedRoles={["user", "admin", "instructor"]} />}>
           <Route path="/*" element={<MainLayout />} />
         </Route>
       </Routes>
