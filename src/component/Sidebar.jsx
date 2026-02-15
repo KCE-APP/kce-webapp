@@ -16,6 +16,8 @@ function Sidebar() {
     verfication: "https://cdn-icons-png.flaticon.com/512/9521/9521251.png",
   };
 
+  const user = JSON.parse(localStorage.getItem("user"));
+
   return (
     <div className="sidebar bg-white border-end h-100 pt-3">
       <Nav className="flex-column gap-2 px-2">
@@ -82,54 +84,58 @@ function Sidebar() {
           />
           <span className="fw-medium">Submission Approval</span>
         </Nav.Link>
-        <Nav.Link
-          as={NavLink}
-          to="/point-rules"
-          className="sidebar-link d-flex align-items-center gap-3 px-1 py-2 rounded text-decoration-none"
-        >
-          <img
-            src={icons.rules}
-            alt="icon"
-            style={{ width: "20px", height: "20px", objectFit: "contain" }}
-          />
-          <span className="fw-medium">Point Rules</span>
-        </Nav.Link>
-        <Nav.Link
-          as={NavLink}
-          to="/staff"
-          className="sidebar-link d-flex align-items-center gap-3 px-1 py-2 rounded text-decoration-none"
-        >
-          <img
-            src={icons.staff}
-            alt="icon"
-            style={{ width: "20px", height: "20px", objectFit: "contain" }}
-          />
-          <span className="fw-medium">Manage Staff</span>
-        </Nav.Link>
-        <Nav.Link
-          as={NavLink}
-          to="/semester"
-          className="sidebar-link d-flex align-items-center gap-3 px-1 py-2 rounded text-decoration-none"
-        >
-          <img
-            src={icons.semester}
-            alt="icon"
-            style={{ width: "20px", height: "20px", objectFit: "contain" }}
-          />
-          <span className="fw-medium">Manage Semester</span>
-        </Nav.Link>
-        <Nav.Link
-          as={NavLink}
-          to="/reward-catalog"
-          className="sidebar-link d-flex align-items-center gap-3 px-1 py-2 rounded text-decoration-none"
-        >
-          <img
-            src={icons.catalog}
-            alt="icon"
-            style={{ width: "20px", height: "20px", objectFit: "contain" }}
-          />
-          <span className="fw-medium">Reward Catalog</span>
-        </Nav.Link>
+        {user?.role === "admin" && (
+          <>
+            <Nav.Link
+              as={NavLink}
+              to="/point-rules"
+              className="sidebar-link d-flex align-items-center gap-3 px-1 py-2 rounded text-decoration-none"
+            >
+              <img
+                src={icons.rules}
+                alt="icon"
+                style={{ width: "20px", height: "20px", objectFit: "contain" }}
+              />
+              <span className="fw-medium">Point Rules</span>
+            </Nav.Link>
+            <Nav.Link
+              as={NavLink}
+              to="/staff"
+              className="sidebar-link d-flex align-items-center gap-3 px-1 py-2 rounded text-decoration-none"
+            >
+              <img
+                src={icons.staff}
+                alt="icon"
+                style={{ width: "20px", height: "20px", objectFit: "contain" }}
+              />
+              <span className="fw-medium">Manage Staff</span>
+            </Nav.Link>
+            <Nav.Link
+              as={NavLink}
+              to="/semester"
+              className="sidebar-link d-flex align-items-center gap-3 px-1 py-2 rounded text-decoration-none"
+            >
+              <img
+                src={icons.semester}
+                alt="icon"
+                style={{ width: "20px", height: "20px", objectFit: "contain" }}
+              />
+              <span className="fw-medium">Manage Semester</span>
+            </Nav.Link>
+            <Nav.Link
+              as={NavLink}
+              to="/reward-catalog"
+              className="sidebar-link d-flex align-items-center gap-3 px-1 py-2 rounded text-decoration-none"
+            >
+              <img
+                src={icons.catalog}
+                alt="icon"
+                style={{ width: "20px", height: "20px", objectFit: "contain" }}
+              />
+              <span className="fw-medium">Reward Catalog</span>
+            </Nav.Link>
+          </>
+        )}
         <Nav.Link
           as={NavLink}
           to="/redemption-history"
