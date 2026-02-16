@@ -123,8 +123,16 @@ export default function RewardCatalogPage() {
 
   const handleSave = async (payload) => {
     try {
+      const config = {
+        headers: {},
+      };
+
+      if (payload instanceof FormData) {
+        config.headers["Content-Type"] = "multipart/form-data";
+      }
+
       if (editingItem) {
-        await api.patch(`/rewards/catalog/${editingItem._id}`, payload);
+        await api.patch(`/rewards/catalog/${editingItem._id}`, payload, config);
         Swal.fire({
           icon: "success",
           title: "Reward updated successfully!",
@@ -134,7 +142,7 @@ export default function RewardCatalogPage() {
           showConfirmButton: false,
         });
       } else {
-        await api.post("/rewards/catalog", payload);
+        await api.post("/rewards/catalog", payload, config);
         Swal.fire({
           icon: "success",
           title: "New reward added successfully!",
