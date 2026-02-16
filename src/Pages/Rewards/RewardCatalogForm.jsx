@@ -27,32 +27,37 @@ const RewardCatalogForm = forwardRef(
       "Other",
     ];
 
-    useImperativeHandle(ref, () => ({
-      submitForm: async () => {
-        if (validate()) {
-          setIsSubmitting(true);
-          try {
-            const formData = new FormData();
-            formData.append("name", form.name);
-            formData.append("pointsCost", form.pointsCost);
-            formData.append("stock", form.stock);
-            formData.append("category", form.category);
+    const processSubmit = async () => {
+      if (validate()) {
+        setIsSubmitting(true);
+        try {
+          const formData = new FormData();
+          formData.append("name", form.name);
+          formData.append("pointsCost", form.pointsCost);
+          formData.append("stock", form.stock);
+          formData.append("category", form.category);
 
-            if (form.image) {
-              formData.append("image", form.image);
-            }
-
-            await onSave(formData);
-            return true;
-          } catch (error) {
-            console.error("Submit failed", error);
-            return false;
-          } finally {
-            setIsSubmitting(false);
+          if (form.image) {
+            formData.append("image", form.image);
           }
+
+          // Log to debug what is being sent
+          console.log("Submitting FormData", form);
+
+          await onSave(formData);
+          return true;
+        } catch (error) {
+          console.error("Submit failed", error);
+          return false;
+        } finally {
+          setIsSubmitting(false);
         }
-        return false;
-      },
+      }
+      return false;
+    };
+
+    useImperativeHandle(ref, () => ({
+      submitForm: processSubmit,
     }));
 
     useEffect(() => {
@@ -105,9 +110,7 @@ const RewardCatalogForm = forwardRef(
 
     const handleSubmit = async (e) => {
       e.preventDefault();
-      if (ref.current) {
-        ref.current.submitForm();
-      }
+      await processSubmit();
     };
 
     return (
