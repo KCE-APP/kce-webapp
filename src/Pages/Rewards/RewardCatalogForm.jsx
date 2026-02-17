@@ -1,6 +1,8 @@
 import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Form, Row, Col, Card } from "react-bootstrap";
 import { Upload as UploadIcon, X as XIcon } from "lucide-react";
+import SecureImage from "../../component/SecureImage";
+import { formatImageUrl } from "../../utils/ImageUrlFormat";
 
 const RewardCatalogForm = forwardRef(
   ({ initialData, onSave, onCancel, setIsDirty }, ref) => {
@@ -240,16 +242,21 @@ const RewardCatalogForm = forwardRef(
                   >
                     {form.imageUrl ? (
                       <div className="position-relative w-100 h-100 d-flex align-items-center justify-content-center">
-                        <img
-                          src={
-                            form.imageUrl.startsWith("blob:")
-                              ? form.imageUrl
-                              : `${import.meta.env.VITE_IMAGE_BASE_URL || ""}/${form.imageUrl}`
-                          }
-                          alt="Preview"
-                          className="img-fluid rounded"
-                          style={{ maxHeight: "200px", objectFit: "contain" }}
-                        />
+                        {form.imageUrl.startsWith("blob:") ? (
+                          <img
+                            src={form.imageUrl}
+                            alt="Preview"
+                            className="img-fluid rounded"
+                            style={{ maxHeight: "200px", objectFit: "contain" }}
+                          />
+                        ) : (
+                          <SecureImage
+                            src={formatImageUrl(form.imageUrl)}
+                            alt="Preview"
+                            className="img-fluid rounded"
+                            style={{ maxHeight: "200px", objectFit: "contain" }}
+                          />
+                        )}
                         <button
                           type="button"
                           className="btn btn-sm btn-danger position-absolute top-0 end-0 m-1 rounded-circle p-1"
@@ -280,10 +287,9 @@ const RewardCatalogForm = forwardRef(
                           onChange={handleChange}
                           accept="image/*"
                           className="d-none"
-                          id="image-upload"
                         />
                         <label
-                          htmlFor="image-upload"
+                          htmlFor="formImage"
                           className="btn btn-sm btn-outline-primary"
                         >
                           Choose File
