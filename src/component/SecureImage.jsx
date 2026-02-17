@@ -1,6 +1,6 @@
 import { useState, useEffect } from "react";
 
-const SecureImage = ({ src, alt, className, style, ...props }) => {
+const SecureImage = ({ src, alt, className, style, onImageLoaded, ...props }) => {
   const [imageSrc, setImageSrc] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -12,6 +12,7 @@ const SecureImage = ({ src, alt, className, style, ...props }) => {
     const fetchImage = async () => {
       if (!src) {
         setLoading(false);
+        if (onImageLoaded) onImageLoaded();
         return;
       }
 
@@ -19,6 +20,7 @@ const SecureImage = ({ src, alt, className, style, ...props }) => {
       if (src.startsWith("data:") || src.startsWith("blob:")) {
         setImageSrc(src);
         setLoading(false);
+        if (onImageLoaded) onImageLoaded();
         return;
       }
 
@@ -44,6 +46,7 @@ const SecureImage = ({ src, alt, className, style, ...props }) => {
         if (isMounted) {
           setImageSrc(objectUrl);
           setLoading(false);
+          if (onImageLoaded) onImageLoaded();
         }
       } catch (err) {
         console.error("Error loading secure image:", err);
@@ -54,6 +57,7 @@ const SecureImage = ({ src, alt, className, style, ...props }) => {
           setImageSrc(src);
           setError(true);
           setLoading(false);
+          if (onImageLoaded) onImageLoaded();
         }
       }
     };
