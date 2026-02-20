@@ -2,6 +2,7 @@ import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Form, Button, Row, Col, Card } from "react-bootstrap";
 import ReactQuill from "react-quill-new";
 import "quill/dist/quill.snow.css";
+import api from "../../api/axios";
 
 const AchieversForm = forwardRef(
   ({ initialData, onSave, onCancel, setIsDirty }, ref) => {
@@ -15,6 +16,7 @@ const AchieversForm = forwardRef(
       college: "",
       batch: "",
       category: "",
+      points: "",
       description: "",
       status: true,
       eventDate: "",
@@ -23,12 +25,9 @@ const AchieversForm = forwardRef(
       otherCategory: "",
     });
 
-    const PREDEFINED_CATEGORIES = [
-      "Academics",
-      "Placement",
-      "Hackathon",
-      "Sports",
-    ];
+    const [categories, setCategories] = useState([]);
+
+    const PREDEFINED_CATEGORIES = categories.map((c) => c.category);
 
     const DEPARTMENTS = [
       "IT",
@@ -63,6 +62,7 @@ const AchieversForm = forwardRef(
                   dept: s.dept === "Others" ? s.otherDept : s.dept,
                 }));
                 formData.append("students", JSON.stringify(studentsToSubmit));
+                formData.append("points", form.points);
                 // Append student images
                 form.students.forEach((student, index) => {
                   if (student.imageFile) {
@@ -103,13 +103,31 @@ const AchieversForm = forwardRef(
     }));
 
     useEffect(() => {
+      const fetchCategories = async () => {
+        try {
+          const res = await api.get("/rewards/rules", {
+            params: { limit: 1000 },
+          });
+          if (res.data && Array.isArray(res.data.data)) {
+            setCategories(res.data.data);
+          }
+        } catch (error) {
+          console.error("Failed to fetch categories", error);
+        }
+      };
+      fetchCategories();
+    }, []);
+
+    useEffect(() => {
       if (initialData) {
-        // ... existing initialization logic ...
         // Determine initial category state
         let initCategory = initialData.category || "";
         let initOtherCategory = "";
 
-        if (initCategory && !PREDEFINED_CATEGORIES.includes(initCategory)) {
+        // If categories are loaded, we can check against them
+        const isPredefined = categories.some((c) => c.category === initCategory);
+
+        if (initCategory && !isPredefined && categories.length > 0) {
           initOtherCategory = initCategory;
           initCategory = "Others";
         }
@@ -119,6 +137,7 @@ const AchieversForm = forwardRef(
           college: initialData.college || "",
           batch: initialData.batch || "",
           category: initCategory,
+          points: initialData.points || "",
           otherCategory: initOtherCategory,
           description: initialData.description || "",
           status: initialData.status !== undefined ? initialData.status : true,
@@ -132,6 +151,7 @@ const AchieversForm = forwardRef(
           students: initialData.students
             ? initialData.students.map((s) => ({
                 ...s,
+                rollNo: s.rollNo || "",
                 dept: DEPARTMENTS.includes(s.dept) ? s.dept : "Others",
                 otherDept: DEPARTMENTS.includes(s.dept) ? "" : s.dept,
               }))
@@ -145,7 +165,7 @@ const AchieversForm = forwardRef(
           setEntryType("image");
         }
       }
-    }, [initialData]);
+    }, [initialData, categories]);
 
     const handleDescriptionChange = (value) => {
       setForm((prev) => ({ ...prev, description: value }));
@@ -163,12 +183,22 @@ const AchieversForm = forwardRef(
       }
 
       // If switching away from 'Others', clear the custom input
-      if (name === "category" && value !== "Others") {
-        setForm({
-          ...form,
-          category: value,
-          otherCategory: "",
-        });
+      if (name === "category") {
+        if (value !== "Others") {
+          const selectedCat = categories.find((c) => c.category === value);
+          setForm({
+            ...form,
+            category: value,
+            points: selectedCat ? selectedCat.points : "",
+            otherCategory: "",
+          });
+        } else {
+          setForm({
+            ...form,
+            category: value,
+            points: 0,
+          });
+        }
       } else {
         setForm({
           ...form,
@@ -210,6 +240,7 @@ const AchieversForm = forwardRef(
         (_, i) =>
           oldStudents[i] || {
             name: "",
+            rollNo: "",
             year: "",
             dept: "",
             otherDept: "",
@@ -254,36 +285,40 @@ const AchieversForm = forwardRef(
         }
       }
 
-      if (entryType === "manual") {
-        if (studentCount <= 0) {
-          newErrors.studentCount = "Value should not be zero";
-          newErrors.evidence = "Please add at least one student";
-        } else if (studentCount > 10) {
-          newErrors.studentCount = "Maximum 10 students allowed";
-          newErrors.evidence = "You can add up to 10 students only";
-        } else {
-          // Validate students
-          let hasStudentIssues = false;
+      // Validate students (Mandatory in both modes)
+      if (studentCount <= 0) {
+        newErrors.studentCount = "Value should not be zero";
+        newErrors.evidence = "Please add at least one student";
+      } else if (studentCount > 10) {
+        newErrors.studentCount = "Maximum 10 students allowed";
+        newErrors.evidence = "You can add up to 10 students only";
+      } else {
+        const invalidStudents = form.students.some((s) => {
+          const name = s.name || "";
+          const rollNo = s.rollNo || "";
+          const year = s.year || "";
+          const dept = s.dept || "";
+          const otherDept = s.otherDept || "";
 
-          const invalidStudents = form.students.some((s) => {
-            const name = s.name || "";
-            const year = s.year || "";
-            const dept = s.dept || "";
-            const otherDept = s.otherDept || "";
-
-            const nameInvalid = !name.trim();
-            const yearInvalid = !year.trim();
-            const deptInvalid =
-              !dept.trim() || (dept === "Others" && !otherDept.trim());
-
-            return nameInvalid || yearInvalid || deptInvalid;
-          });
-
-          if (invalidStudents) {
-            newErrors.evidence =
-              "Please fill all required student fields (Name, Year, Dept)";
-            newErrors.studentErrors = true; // Flag to trigger row-level visual feedback
+          const nameInvalid = !name.trim();
+          const rollNoInvalid = !rollNo.trim();
+          
+          // Year and Dept are only mandatory in Manual mode
+          let yearInvalid = false;
+          let deptInvalid = false;
+          
+          if (entryType === "manual") {
+            yearInvalid = !year.trim();
+            deptInvalid = !dept.trim() || (dept === "Others" && !otherDept.trim());
           }
+
+          return nameInvalid || rollNoInvalid || yearInvalid || deptInvalid;
+        });
+
+        if (invalidStudents) {
+          const requiredFields = entryType === "manual" ? "(Name, Roll No, Year, Dept)" : "(Name, Roll No)";
+          newErrors.evidence = `Please fill all required student fields ${requiredFields}`;
+          newErrors.studentErrors = true;
         }
       }
 
@@ -306,6 +341,7 @@ const AchieversForm = forwardRef(
                 dept: s.dept === "Others" ? s.otherDept : s.dept,
               }));
               formData.append("students", JSON.stringify(studentsToSubmit));
+              formData.append("points", form.points);
 
               // Append student images
               form.students.forEach((student, index) => {
@@ -414,7 +450,7 @@ const AchieversForm = forwardRef(
             </Row>
 
             <Row className="mb-4">
-              <Col md={4} className="mb-3 mb-md-0">
+              <Col md={3} className="mb-3 mb-md-0">
                 <Form.Group controlId="formBatch">
                   <Form.Label>
                     Batch <span className="text-danger">*</span>
@@ -448,11 +484,12 @@ const AchieversForm = forwardRef(
                     style={{ borderRadius: "6px" }}
                   >
                     <option value="">Select Category</option>
-                    <option>Academics</option>
-                    <option>Placement</option>
-                    <option>Hackathon</option>
-                    <option>Sports</option>
-                    <option>Others</option>
+                    {categories.map((cat) => (
+                      <option key={cat._id} value={cat.category}>
+                        {cat.category}
+                      </option>
+                    ))}
+                    <option value="Others">Others</option>
                   </Form.Select>
                   <Form.Control.Feedback type="invalid">
                     {errors.category}
@@ -478,7 +515,20 @@ const AchieversForm = forwardRef(
                   )}
                 </Form.Group>
               </Col>
-              <Col md={4}>
+              <Col md={2}>
+                <Form.Group controlId="formPoints">
+                  <Form.Label>Points</Form.Label>
+                  <Form.Control
+                    type="text"
+                    name="points"
+                    value={form.points}
+                    readOnly
+                    className="bg-light shadow-none"
+                    style={{ borderRadius: "6px" }}
+                  />
+                </Form.Group>
+              </Col>
+              <Col md={3}>
                 <Form.Group controlId="formEventDate">
                   <Form.Label>Event Date</Form.Label>
                   <Form.Control
@@ -575,15 +625,13 @@ const AchieversForm = forwardRef(
                 checked={entryType === "image"}
                 onChange={() => {
                   setEntryType("image");
-                  setStudentCount(0);
-                  setForm((prev) => ({ ...prev, students: [] }));
                   setIsDirty && setIsDirty(true);
                 }}
                 className="fw-medium small text-muted"
               />
               <Form.Check
                 type="radio"
-                label="Manual Student Entry"
+                label="Manual Student Entry Only"
                 name="entryType"
                 id="typeManual"
                 value="manual"
@@ -637,32 +685,36 @@ const AchieversForm = forwardRef(
                   </Form.Group>
                 )}
 
-                {entryType === "manual" && (
-                  <div>
-                    <Form.Group controlId="formStudentCount" className="mb-3">
-                      <Form.Label>Number of Students (Max:10)</Form.Label>
-                      <Form.Control
-                        type="number"
-                        min="0"
-                        max="10"
-                        value={studentCount.toString()}
-                        onChange={(e) => {
-                          let val = parseInt(e.target.value, 10);
-                          if (isNaN(val)) val = 0;
-                          if (val > 10) val = 10;
-                          handleStudentCount(val);
-                        }}
-                        placeholder="e.g. 5"
-                        isInvalid={!!errors.studentCount}
-                        className="shadow-none"
-                        style={{ maxWidth: "150px", borderRadius: "6px" }}
-                      />
-                      <Form.Control.Feedback type="invalid">
-                        {errors.studentCount}
-                      </Form.Control.Feedback>
-                    </Form.Group>
+                <div>
+                  <Form.Group controlId="formStudentCount" className="mb-3">
+                    <Form.Label>Number of Achievers <span className="text-danger">*</span> (Max:10)</Form.Label>
+                    <Form.Control
+                      type="number"
+                      min="0"
+                      max="10"
+                      value={studentCount.toString()}
+                      onChange={(e) => {
+                        let val = parseInt(e.target.value, 10);
+                        if (isNaN(val)) val = 0;
+                        if (val > 10) val = 10;
+                        handleStudentCount(val);
+                      }}
+                      placeholder="e.g. 5"
+                      isInvalid={!!errors.studentCount}
+                      className="shadow-none"
+                      style={{ maxWidth: "150px", borderRadius: "6px" }}
+                    />
+                    <Form.Control.Feedback type="invalid">
+                      {errors.studentCount}
+                    </Form.Control.Feedback>
+                    <div className="text-muted small mt-1">
+                      {entryType === "image" 
+                        ? "Enter student details to automatically award points."
+                        : "Enter details for each achiever."}
+                    </div>
+                  </Form.Group>
 
-                    {form.students.length > 0 && (
+                  {form.students.length > 0 && (
                       <div className="card border shadow-sm">
                         <div className="table-responsive">
                           <table className="table table-hover align-middle mb-0">
@@ -676,28 +728,38 @@ const AchieversForm = forwardRef(
                                 </th>
                                 <th
                                   className="py-3 text-secondary text-uppercase small fw-bold"
-                                  style={{ width: "25%" }}
+                                  style={{ width: entryType === "image" ? "40%" : "20%" }}
                                 >
                                   Name <span className="text-danger">*</span>
                                 </th>
                                 <th
                                   className="py-3 text-secondary text-uppercase small fw-bold"
-                                  style={{ width: "15%" }}
+                                  style={{ width: entryType === "image" ? "40%" : "15%" }}
                                 >
-                                  Year <span className="text-danger">*</span>
+                                  Roll No <span className="text-danger">*</span>
                                 </th>
-                                <th
-                                  className="py-3 text-secondary text-uppercase small fw-bold"
-                                  style={{ width: "20%" }}
-                                >
-                                  Dept <span className="text-danger">*</span>
-                                </th>
-                                <th
-                                  className="py-3 text-secondary text-uppercase small fw-bold"
-                                  style={{ width: "35%" }}
-                                >
-                                  Photo URL
-                                </th>
+                                {entryType === "manual" && (
+                                  <>
+                                    <th
+                                      className="py-3 text-secondary text-uppercase small fw-bold"
+                                      style={{ width: "12%" }}
+                                    >
+                                      Year <span className="text-danger">*</span>
+                                    </th>
+                                    <th
+                                      className="py-3 text-secondary text-uppercase small fw-bold"
+                                      style={{ width: "18%" }}
+                                    >
+                                      Dept <span className="text-danger">*</span>
+                                    </th>
+                                    <th
+                                      className="py-3 text-secondary text-uppercase small fw-bold"
+                                      style={{ width: "30%" }}
+                                    >
+                                      Photo URL
+                                    </th>
+                                  </>
+                                )}
                               </tr>
                             </thead>
                             <tbody>
@@ -725,109 +787,131 @@ const AchieversForm = forwardRef(
                                     />
                                   </td>
                                   <td className="p-2">
-                                    <Form.Select
+                                    <Form.Control
                                       size="sm"
-                                      value={student.year}
+                                      placeholder="Roll No"
+                                      value={student.rollNo}
                                       onChange={(e) =>
                                         handleStudentChange(
                                           index,
-                                          "year",
-                                          e.target.value,
+                                          "rollNo",
+                                          e.target.value.toUpperCase(),
                                         )
                                       }
                                       isInvalid={
                                         errors.studentErrors &&
-                                        !(student.year || "").trim()
+                                        !(student.rollNo || "").trim()
                                       }
-                                    >
-                                      <option value="">Select Year</option>
-                                      <option value="I">I</option>
-                                      <option value="II">II</option>
-                                      <option value="III">III</option>
-                                      <option value="IV">IV</option>
-                                    </Form.Select>
+                                    />
                                   </td>
-                                  <td className="p-2">
-                                    <Form.Select
-                                      size="sm"
-                                      value={student.dept}
-                                      onChange={(e) =>
-                                        handleStudentChange(
-                                          index,
-                                          "dept",
-                                          e.target.value,
-                                        )
-                                      }
-                                      isInvalid={
-                                        errors.studentErrors &&
-                                        !(student.dept || "").trim()
-                                      }
-                                      className="mb-1"
-                                    >
-                                      <option value="">Select Dept</option>
-                                      {DEPARTMENTS.map((d) => (
-                                        <option key={d} value={d}>
-                                          {d}
-                                        </option>
-                                      ))}
-                                      <option value="Others">Others</option>
-                                    </Form.Select>
-                                    {student.dept === "Others" && (
-                                      <Form.Control
-                                        type="text"
-                                        size="sm"
-                                        placeholder="Specify Dept"
-                                        value={student.otherDept}
-                                        onChange={(e) =>
-                                          handleStudentChange(
-                                            index,
-                                            "otherDept",
-                                            e.target.value,
-                                          )
-                                        }
-                                        isInvalid={
-                                          errors.studentErrors &&
-                                          !student.otherDept?.trim()
-                                        }
-                                      />
-                                    )}
-                                  </td>
-                                  <td className="p-2">
-                                    <div className="d-flex align-items-center gap-2">
-                                      {student.imageUrl && (
-                                        <img
-                                          src={
-                                            student.imageUrl.startsWith(
-                                              "blob:",
-                                            ) ||
-                                            student.imageUrl.startsWith("http")
-                                              ? student.imageUrl
-                                              : `${import.meta.env.VITE_IMAGE_BASE_URL}/${student.imageUrl.replace(/\\/g, "/")}`
+                                  {entryType === "manual" && (
+                                    <>
+                                      <td className="p-2">
+                                        <Form.Select
+                                          size="sm"
+                                          value={student.year}
+                                          onChange={(e) =>
+                                            handleStudentChange(
+                                              index,
+                                              "year",
+                                              e.target.value,
+                                            )
                                           }
-                                          alt="Preview"
-                                          className="rounded-circle object-fit-cover"
-                                          style={{
-                                            width: "32px",
-                                            height: "32px",
-                                          }}
-                                        />
-                                      )}
-                                      <Form.Control
-                                        type="file"
-                                        size="sm"
-                                        accept="image/*"
-                                        onChange={(e) =>
-                                          handleStudentChange(
-                                            index,
-                                            "imageFile",
-                                            e.target.files[0],
-                                          )
-                                        }
-                                        className="shadow-none border-secondary-subtle"
-                                        style={{ fontSize: "0.8rem" }}
-                                      />
-                                    </div>
-                                  </td>
+                                          isInvalid={
+                                            errors.studentErrors &&
+                                            !(student.year || "").trim()
+                                          }
+                                        >
+                                          <option value="">Select Year</option>
+                                          <option value="I">I</option>
+                                          <option value="II">II</option>
+                                          <option value="III">III</option>
+                                          <option value="IV">IV</option>
+                                        </Form.Select>
+                                      </td>
+                                      <td className="p-2">
+                                        <Form.Select
+                                          size="sm"
+                                          value={student.dept}
+                                          onChange={(e) =>
+                                            handleStudentChange(
+                                              index,
+                                              "dept",
+                                              e.target.value,
+                                            )
+                                          }
+                                          isInvalid={
+                                            errors.studentErrors &&
+                                            !(student.dept || "").trim()
+                                          }
+                                          className="mb-1"
+                                        >
+                                          <option value="">Select Dept</option>
+                                          {DEPARTMENTS.map((d) => (
+                                            <option key={d} value={d}>
+                                              {d}
+                                            </option>
+                                          ))}
+                                          <option value="Others">Others</option>
+                                        </Form.Select>
+                                        {student.dept === "Others" && (
+                                          <Form.Control
+                                            type="text"
+                                            size="sm"
+                                            placeholder="Specify Dept"
+                                            value={student.otherDept}
+                                            onChange={(e) =>
+                                              handleStudentChange(
+                                                index,
+                                                "otherDept",
+                                                e.target.value,
+                                              )
+                                            }
+                                            isInvalid={
+                                              errors.studentErrors &&
+                                              !student.otherDept?.trim()
+                                            }
+                                          />
+                                        )}
+                                      </td>
+                                      <td className="p-2">
+                                        <div className="d-flex align-items-center gap-2">
+                                          {student.imageUrl && (
+                                            <img
+                                              src={
+                                                student.imageUrl.startsWith(
+                                                  "blob:",
+                                                ) ||
+                                                student.imageUrl.startsWith("http")
+                                                  ? student.imageUrl
+                                                  : `${import.meta.env.VITE_IMAGE_BASE_URL}/${student.imageUrl.replace(/\\/g, "/")}`
+                                              }
+                                              alt="Preview"
+                                              className="rounded-circle object-fit-cover"
+                                              style={{
+                                                width: "32px",
+                                                height: "32px",
+                                              }}
+                                            />
+                                          )}
+                                          <Form.Control
+                                            type="file"
+                                            size="sm"
+                                            accept="image/*"
+                                            onChange={(e) =>
+                                              handleStudentChange(
+                                                index,
+                                                "imageFile",
+                                                e.target.files[0],
+                                              )
+                                            }
+                                            className="shadow-none border-secondary-subtle"
+                                            style={{ fontSize: "0.8rem" }}
+                                          />
+                                        </div>
+                                      </td>
+                                    </>
+                                  )}
                                 </tr>
                               ))}
                             </tbody>
@@ -836,8 +920,7 @@ const AchieversForm = forwardRef(
                       </div>
                     )}
                   </div>
-                )}
-              </Col>
+                </Col>
             </Row>
 
             {/* Actions */}

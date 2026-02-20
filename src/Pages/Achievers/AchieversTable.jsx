@@ -338,7 +338,19 @@ export default function AchieversTable({
                         </div>
                       </td>
                       <td className="text-center">
-                        {a.students && a.students.length > 0 ? (
+                        {a.posterImage && a.posterImage !== "null" ? (
+                          <Tooltip title="View Evidence">
+                            <Button
+                              variant="light"
+                              className="action-btn mx-auto"
+                              onClick={() =>
+                                handleViewImage(a.name, a.posterImage)
+                              }
+                            >
+                              <VisibilityIcon fontSize="small" />
+                            </Button>
+                          </Tooltip>
+                        ) : a.students && a.students.length > 0 ? (
                           <Tooltip title="View Students">
                             <Button
                               variant="light"
@@ -352,18 +364,6 @@ export default function AchieversTable({
                               }
                             >
                               <GroupsIcon fontSize="small" />
-                            </Button>
-                          </Tooltip>
-                        ) : a.posterImage && a.posterImage !== "null" ? (
-                          <Tooltip title="View Evidence">
-                            <Button
-                              variant="light"
-                              className="action-btn mx-auto"
-                              onClick={() =>
-                                handleViewImage(a.name, a.posterImage)
-                              }
-                            >
-                              <VisibilityIcon fontSize="small" />
                             </Button>
                           </Tooltip>
                         ) : (
