@@ -6,15 +6,27 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import logo from "../assets/logo.png";
 import "../styles/header.css";
 
+import api from "../api/axios";
+
 function Header() {
   const navigate = useNavigate();
 
-  const handleLogout = () => {
-    // Clear user data
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
-    // Redirect to login
-    navigate("/login");
+  const handleLogout = async () => {
+    try {
+      const user = JSON.parse(localStorage.getItem("user") || "{}");
+      const logoutEndpoint = user.role === "admin" ? "/auth/staff-logout" : "/auth/logout";
+      
+      await api.post(logoutEndpoint);
+    } catch (error) {
+      console.error("Logout error:", error);
+    } finally {
+      // Clear user data
+      localStorage.removeItem("token");
+      localStorage.removeItem("refreshToken");
+      localStorage.removeItem("user");
+      // Redirect to login
+      navigate("/login");
+    }
   };
 
   // Get user info from local storage (optional, for display)
