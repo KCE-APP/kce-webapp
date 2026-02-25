@@ -4,6 +4,7 @@ import EmojiEventsIcon from "@mui/icons-material/EmojiEventsOutlined";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import api from "../../api/axios";
 import AchievementDetailsPlaceholder, { SkeletonBox } from "../../component/AchievementDetailsPlaceholder";
+import SecureImage from "../../component/SecureImage";
 
 export default function AchievementDetails() {
   const [processing, setProcessing] = useState(false);
@@ -22,6 +23,7 @@ export default function AchievementDetails() {
     const fetchAPI = async () => {
       try {
         const res = await api.get(`/rewards/submission/${achievementInfo}`);
+        // console.log(res.data.data);
         setAchievement(res.data.data);
       } catch (error) {
         console.error(error);
@@ -105,9 +107,8 @@ export default function AchievementDetails() {
   const statusStyle = statusColors[achievement.status] || statusColors.pending;
 
   const imageUrl = achievement.evidenceImage
-    ? `${import.meta.env.VITE_IMAGE_BASE_URL}/${achievement.evidenceImage}`
+    ? formatImageUrl(achievement.evidenceImage)
     : null;
-
 
   return (
     <>
@@ -195,40 +196,26 @@ export default function AchievementDetails() {
           {imageUrl && (
             <div style={{ marginBottom: "50px" }}>
               <Label>Evidence</Label>
-              {imageLoading && (
-                <div style={{ marginTop: "10px" }}>
-                  <SkeletonBox height="400px" width="100%" radius="16px" />
-                </div>
-              )}
-              <img
-                src={imageUrl}
-                alt="Evidence"
-                onLoad={() => setImageLoading(false)}
+              <div
                 style={{
-                  width: "100%",
-                  maxHeight: "400px",
-                  objectFit: "cover",
+                  overflow: "hidden",
                   borderRadius: "16px",
                   marginTop: "10px",
-                  display: imageLoading ? "none" : "block",
+                  border: "1px solid #eee",
+                  position: "relative"
                 }}
-              />
-              {!imageLoading && (
-                <div style={{ marginTop: "15px" }}>
-                  <a
-                    href={imageUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    style={{
-                      color: "#f97316",
-                      fontWeight: 600,
-                      textDecoration: "none",
-                    }}
-                  >
-                    View Full Image →
-                  </a>
-                </div>
-              )}
+              >
+                <SecureImage
+                  src={imageUrl}
+                  alt="Evidence"
+                  className="w-100 d-block"
+                  style={{
+                    maxHeight: "500px",
+                    objectFit: "contain",
+                    backgroundColor: "#f8f9fa",
+                  }}
+                />
+              </div>
             </div>
           )}
 
@@ -458,6 +445,17 @@ export default function AchievementDetails() {
       )}
     </>
   );
+}
+
+function formatImageUrl(url) {
+  if (!url || typeof url !== "string") return "";
+
+  if (!url.startsWith("http") && !url.startsWith("https")) {
+    const cleanPath = url.replace(/\\/g, "/");
+    return `${import.meta.env.VITE_IMAGE_BASE_URL}/${cleanPath}`;
+  }
+
+  return url;
 }
 
 const Label = ({ children }) => (
