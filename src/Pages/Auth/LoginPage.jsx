@@ -83,6 +83,9 @@ const LoginPage = () => {
 
         if (token) {
           localStorage.setItem("token", token);
+          if (response.data.refreshToken) {
+            localStorage.setItem("refreshToken", response.data.refreshToken);
+          }
           localStorage.setItem("user", JSON.stringify(staff || {}));
 
           const Toast = Swal.mixin({
