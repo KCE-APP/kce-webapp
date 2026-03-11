@@ -14,6 +14,7 @@ function Sidebar() {
     catalog: "https://cdn-icons-png.flaticon.com/512/3081/3081648.png",
     history: "https://cdn-icons-png.flaticon.com/512/3503/3503786.png",
     verfication: "https://cdn-icons-png.flaticon.com/512/9521/9521251.png",
+    careers: "https://cdn-icons-png.flaticon.com/512/1063/1063376.png",
   };
 
   const user = JSON.parse(localStorage.getItem("user"));
@@ -147,6 +148,18 @@ function Sidebar() {
             style={{ width: "20px", height: "20px", objectFit: "contain" }}
           />
           <span className="fw-medium">Redemption History</span>
+        </Nav.Link>
+        <Nav.Link
+          as={NavLink}
+          to="/careers"
+          className="sidebar-link d-flex align-items-center gap-3 px-1 py-2 rounded text-decoration-none"
+        >
+          <img
+            src={icons.careers}
+            alt="icon"
+            style={{ width: "20px", height: "20px", objectFit: "contain" }}
+          />
+          <span className="fw-medium">Careers</span>
         </Nav.Link>
 
       </Nav>

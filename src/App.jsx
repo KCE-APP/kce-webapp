@@ -18,6 +18,7 @@ import StaffPage from "./Pages/Staff/StaffPage";
 import SemesterPage from "./Pages/Semester/SemesterPage";
 import RewardCatalogPage from "./Pages/Rewards/RewardCatalogPage";
 import RedemptionHistoryPage from "./Pages/Rewards/RedemptionHistoryPage";
+import CareersPage from "./Pages/Careers/CareersPage";
 
 function MainLayout() {
   return (
@@ -46,6 +47,7 @@ function MainLayout() {
                 path="/redemption-history"
                 element={<RedemptionHistoryPage />}
               />
+              <Route path="/careers" element={<CareersPage />} />
             </Route>
 
             {/* Admin Only Routes */}
