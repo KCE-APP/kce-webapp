@@ -98,7 +98,7 @@ export default function CareerTable({
               <thead>
                 <tr>
                   <th className="ps-4" style={{ width: "35%" }}>
-                    Career Details
+                    Placement Details
                   </th>
                   <th style={{ width: "30%" }}>Reactions</th>
                   <th className="text-center" style={{ width: "15%" }}>
@@ -115,7 +115,7 @@ export default function CareerTable({
                     <td colSpan="4" className="text-center py-5">
                       <div className="text-muted d-flex flex-column align-items-center">
                         <SearchIcon size={32} className="opacity-25 mb-2" />
-                        <h6>No Placement Highlightsfound</h6>
+                        <h6>No Placement Highlights found</h6>
                         <p className="small mb-0">
                           Try adjusting your search criteria
                         </p>
@@ -127,7 +127,7 @@ export default function CareerTable({
                     <tr key={career._id}>
                       <td className="ps-4">
                         <div className="profile-cell-container">
-                          {career.imageUrl ? (
+                          {/* {career.imageUrl ? (
                             <SecureImage
                               src={formatImageUrl(career.imageUrl)}
                               alt=""
@@ -143,9 +143,9 @@ export default function CareerTable({
                               className="rounded-3 bg-light border d-flex align-items-center justify-content-center text-muted"
                               style={{ width: "50px", height: "50px" }}
                             >
-                              <small>JOB</small>
+                              <small>No Image</small>
                             </div>
-                          )}
+                          )} */}
                           <div className="profile-info">
                             <span
                               className="profile-name text-truncate"

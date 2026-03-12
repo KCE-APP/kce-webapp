@@ -4,6 +4,7 @@ import { Navbar, Container, Nav, Image, Dropdown } from "react-bootstrap";
 import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import LogoutIcon from "@mui/icons-material/Logout";
 import logo from "../assets/logo.png";
+// import logo from "../assets/ki_logo_1.png";
 import "../styles/header.css";
 
 import api from "../api/axios";

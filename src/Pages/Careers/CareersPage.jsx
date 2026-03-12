@@ -21,6 +21,8 @@ export default function CareersPage() {
   const [submitting, setSubmitting] = useState(false);
   const [editingId, setEditingId] = useState(null);
   const [validated, setValidated] = useState(false);
+  const [initialData, setInitialData] = useState(null);
+
 
   const [formData, setFormData] = useState({
     title: "",
@@ -72,7 +74,9 @@ export default function CareersPage() {
     setFormData({ title: "", description: "", careerImage: null, imagePreview: null });
     setValidated(false);
     setEditingId(null);
+    setInitialData(null);
   };
+
 
 
   const openAddModal = () => {
@@ -87,14 +91,17 @@ export default function CareersPage() {
   const openEditModal = (career) => {
     resetForm();
     setEditingId(career._id);
-    setFormData({
+    const data = {
       title: career.title || career.name || "",
       description: career.description || "",
       careerImage: null,
       imagePreview: career.imageUrl || "",
-    });
+    };
+    setFormData(data);
+    setInitialData(data);
     setShowModal(true);
   };
+
 
 
 
@@ -234,8 +241,10 @@ export default function CareersPage() {
         submitting={submitting}
         editingId={editingId}
         validated={validated}
+        initialData={initialData}
         primaryColor={PRIMARY_ORANGE}
       />
+
 
 
 
