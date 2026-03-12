@@ -3,7 +3,18 @@ import { Modal, Form, Row, Col, Button, Spinner } from "react-bootstrap";
 import SecureImage from "../../../component/SecureImage";
 
 
-const CareerModal = ({ show, onHide, onSubmit, formData, handleInputChange, handleFileChange, submitting, editingId, validated, primaryColor }) => {
+const CareerModal = ({ show, onHide, onSubmit, formData, handleInputChange, handleFileChange, submitting, editingId, validated, initialData, primaryColor }) => {
+  const isChanged = () => {
+    if (!editingId || !initialData) return true;
+    return (
+      formData.title?.trim() !== initialData.title?.trim() ||
+      formData.description?.trim() !== initialData.description?.trim() ||
+      formData.careerImage !== null
+    );
+  };
+
+  const canSubmit = !editingId || isChanged();
+
 
   return (
     <Modal show={show} onHide={onHide} centered size="lg">
@@ -144,9 +155,10 @@ const CareerModal = ({ show, onHide, onSubmit, formData, handleInputChange, hand
           <Button 
             style={{ backgroundColor: primaryColor, borderColor: primaryColor }} 
             type="submit" 
-            disabled={submitting} 
+            disabled={submitting || !canSubmit} 
             className="px-5 py-2 shadow-sm text-white"
           >
+
             {submitting ? (
               <Spinner animation="border" size="sm" />
             ) : (
