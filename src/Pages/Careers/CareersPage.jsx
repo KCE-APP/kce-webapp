@@ -5,7 +5,7 @@ import api from "../../api/axios";
 import Swal from "sweetalert2";
 
 // Modular Components
-import CareerCard from "./components/CareerCard";
+import CareerTable from "./components/CareerTable";
 import CareerModal from "./components/CareerModal";
 
 export default function CareersPage() {
@@ -20,13 +20,16 @@ export default function CareersPage() {
   const [showModal, setShowModal] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [editingId, setEditingId] = useState(null);
+  const [validated, setValidated] = useState(false);
+
   const [formData, setFormData] = useState({
-    name: "",
     title: "",
-    campus: "",
     description: "",
     careerImage: null,
+    imagePreview: null,
   });
+
+
 
   const fetchCareers = async () => {
     setLoading(true);
@@ -39,7 +42,7 @@ export default function CareersPage() {
       }
     } catch (err) {
       console.error("Failed to fetch careers:", err);
-      setError("Could not load career opportunities. Please try again later.");
+      setError("Could not load Placement Highlights. Please try again later.");
     } finally {
       setLoading(false);
     }
@@ -55,26 +58,45 @@ export default function CareersPage() {
   };
 
   const handleFileChange = (e) => {
-    setFormData((prev) => ({ ...prev, careerImage: e.target.files[0] }));
+    const file = e.target.files[0];
+    if (file) {
+      setFormData((prev) => ({
+        ...prev,
+        careerImage: file,
+        imagePreview: URL.createObjectURL(file),
+      }));
+    }
   };
 
-  const openAddModal = () => {
+  const resetForm = () => {
+    setFormData({ title: "", description: "", careerImage: null, imagePreview: null });
+    setValidated(false);
     setEditingId(null);
-    setFormData({ name: "", title: "", campus: "", description: "", careerImage: null });
+  };
+
+
+  const openAddModal = () => {
+    resetForm();
     setShowModal(true);
   };
 
+
+
+
+
   const openEditModal = (career) => {
+    resetForm();
     setEditingId(career._id);
     setFormData({
-      name: career.name || "",
       title: career.title || career.name || "",
-      campus: career.campus || "",
       description: career.description || "",
       careerImage: null,
+      imagePreview: career.imageUrl || "",
     });
     setShowModal(true);
   };
+
+
 
   const handleDelete = async (id) => {
     const result = await Swal.fire({
@@ -112,17 +134,25 @@ export default function CareersPage() {
   };
 
   const handleSubmit = async (e) => {
+    const form = e.currentTarget;
     e.preventDefault();
+    if (form.checkValidity() === false) {
+      e.stopPropagation();
+      setValidated(true);
+      return;
+    }
     setSubmitting(true);
 
+
     const data = new FormData();
-    data.append("name", formData.name);
-    data.append("title", formData.title || formData.name);
-    data.append("campus", formData.campus);
+    // Consolidate name and title as the backend might expect both
+    data.append("name", formData.title);
+    data.append("title", formData.title);
     data.append("description", formData.description);
     if (formData.careerImage) {
       data.append("careerImage", formData.careerImage);
     }
+
 
     try {
       if (editingId) {
@@ -144,9 +174,9 @@ export default function CareersPage() {
       });
 
       setShowModal(false);
-      setFormData({ name: "", title: "", campus: "", description: "", careerImage: null });
-      setEditingId(null);
+      resetForm();
       fetchCareers();
+
     } catch (err) {
       console.error("Failed to save career:", err);
       Swal.fire({
@@ -164,54 +194,50 @@ export default function CareersPage() {
     <Container className="py-4">
       <div className="d-flex justify-content-between align-items-center mb-4 border-bottom pb-3">
         <div>
-          <h2 className="fw-bold color1 mb-0">Career Opportunities</h2>
-          <p className="text-muted small mb-0">Manage and view job postings across campuses</p>
+          <h2 className="fw-bold color1 mb-0">Placement Highlights</h2>
+          <p className="text-muted small mb-0">Manage and view placement highlights across campuses</p>
         </div>
         <Button 
           style={{ backgroundColor: PRIMARY_ORANGE, borderColor: PRIMARY_ORANGE }} 
           className="d-flex align-items-center gap-2 px-4 shadow-sm py-2"
           onClick={openAddModal}
         >
-          <Plus size={18} /> Add Career
+          <Plus size={18} /> Add Placement Highlight
         </Button>
       </div>
 
-      {loading ? (
-        <div className="d-flex justify-content-center py-5">
-          <Spinner animation="border" style={{ color: PRIMARY_ORANGE }} />
-        </div>
-      ) : error ? (
-        <Alert variant="danger" className="text-center">{error}</Alert>
-      ) : careers.length === 0 ? (
-        <div className="text-center py-5 text-muted border rounded bg-light">
-          <p className="mb-0">No career opportunities found.</p>
-        </div>
+      {error ? (
+        <Alert variant="danger" className="text-center">
+          {error}
+        </Alert>
       ) : (
-        <Row className="g-4">
-          {careers.map((career) => (
-            <CareerCard
-              key={career._id}
-              career={career}
-              onEdit={openEditModal}
-              onDelete={handleDelete}
-              primaryColor={PRIMARY_ORANGE}
-            />
-          ))}
-        </Row>
+        <CareerTable
+          careers={careers}
+          loading={loading}
+          onEdit={openEditModal}
+          onDelete={handleDelete}
+          primaryColor={PRIMARY_ORANGE}
+        />
       )}
 
       {/* Add/Edit Career Modal Component */}
       <CareerModal
         show={showModal}
-        onHide={() => setShowModal(false)}
+        onHide={() => {
+          setShowModal(false);
+          resetForm();
+        }}
         onSubmit={handleSubmit}
         formData={formData}
         handleInputChange={handleInputChange}
         handleFileChange={handleFileChange}
         submitting={submitting}
         editingId={editingId}
+        validated={validated}
         primaryColor={PRIMARY_ORANGE}
       />
+
+
 
       <style>{`
         .focus-orange:focus {

@@ -256,13 +256,13 @@ export default function EventsTable({
                             <span className="profile-subtitle">
                               {e.eventDate
                                 ? new Date(e.eventDate).toLocaleDateString(
-                                    undefined,
-                                    {
-                                      year: "numeric",
-                                      month: "short",
-                                      day: "numeric",
-                                    },
-                                  )
+                                  undefined,
+                                  {
+                                    year: "numeric",
+                                    month: "short",
+                                    day: "numeric",
+                                  },
+                                )
                                 : "No Date"}
                             </span>
                           </div>
