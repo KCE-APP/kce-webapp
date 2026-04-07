@@ -3,6 +3,7 @@ import { Container, Nav, Modal, Button } from "react-bootstrap";
 import api from "../../api/axios";
 import AssignmentsTable from "./components/AssignmentsTable";
 import AssignmentForm from "./components/AssignmentForm";
+import SubmissionsList from "./components/SubmissionsList";
 import Swal from "sweetalert2";
 
 const ManageAssignmentsPage = () => {
@@ -18,6 +19,10 @@ const ManageAssignmentsPage = () => {
   const [filterDept, setFilterDept] = useState("");
   const [filterBatch, setFilterBatch] = useState("");
   const [filterSem, setFilterSem] = useState("");
+
+  // View Control
+  const [viewMode, setViewMode] = useState("list"); // 'list', 'submissions'
+  const [selectedAssignment, setSelectedAssignment] = useState(null);
 
   // Dirty State Logic
   const [isDirty, setIsDirty] = useState(false);
@@ -134,13 +139,28 @@ const ManageAssignmentsPage = () => {
     });
   };
 
+  const handleViewSubmissions = (item) => {
+    setSelectedAssignment(item);
+    setViewMode("submissions");
+  };
+
+  const handleBackToAssignments = () => {
+    setSelectedAssignment(null);
+    setViewMode("list");
+  };
+
   const handleTabSelect = (k) => {
     if (activeTab === "form" && isDirty && k !== "form") {
       setNextTab(k);
       setShowConfirmModal(true);
     } else {
       setActiveTab(k);
-      if (k === "list") setEditingItem(null);
+      if (k === "list") {
+        setEditingItem(null);
+        setViewMode("list"); // Reset to list when switching back to View Assignments
+      } else if (k === "form") {
+        setViewMode("list"); // Switch out of submissions if going to Add New
+      }
     }
   };
 
@@ -192,35 +212,43 @@ const ManageAssignmentsPage = () => {
       </Nav>
 
       {activeTab === "list" && (
-        <AssignmentsTable
-          data={data}
-          loading={loading}
-          onEdit={handleEdit}
-          onDelete={handleDelete}
-          currentPage={currentPage}
-          totalPages={totalPages}
-          onPageChange={setCurrentPage}
-          searchTerm={searchTerm}
-          onSearchChange={(val) => {
-            setSearchTerm(val);
-            setCurrentPage(1);
-          }}
-          filterDept={filterDept}
-          onFilterDeptChange={(val) => {
-            setFilterDept(val);
-            setCurrentPage(1);
-          }}
-          filterBatch={filterBatch}
-          onFilterBatchChange={(val) => {
-            setFilterBatch(val);
-            setCurrentPage(1);
-          }}
-          filterSem={filterSem}
-          onFilterSemChange={(val) => {
-            setFilterSem(val);
-            setCurrentPage(1);
-          }}
-        />
+        viewMode === "submissions" && selectedAssignment ? (
+          <SubmissionsList 
+            assignment={selectedAssignment} 
+            onBack={handleBackToAssignments} 
+          />
+        ) : (
+          <AssignmentsTable
+            data={data}
+            loading={loading}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            onViewSubmissions={handleViewSubmissions}
+            currentPage={currentPage}
+            totalPages={totalPages}
+            onPageChange={setCurrentPage}
+            searchTerm={searchTerm}
+            onSearchChange={(val) => {
+              setSearchTerm(val);
+              setCurrentPage(1);
+            }}
+            filterDept={filterDept}
+            onFilterDeptChange={(val) => {
+              setFilterDept(val);
+              setCurrentPage(1);
+            }}
+            filterBatch={filterBatch}
+            onFilterBatchChange={(val) => {
+              setFilterBatch(val);
+              setCurrentPage(1);
+            }}
+            filterSem={filterSem}
+            onFilterSemChange={(val) => {
+              setFilterSem(val);
+              setCurrentPage(1);
+            }}
+          />
+        )
       )}
 
       {activeTab === "form" && (
