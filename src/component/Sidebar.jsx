@@ -15,13 +15,14 @@ function Sidebar() {
     history: "https://cdn-icons-png.flaticon.com/512/3503/3503786.png",
     verfication: "https://cdn-icons-png.flaticon.com/512/9521/9521251.png",
     careers: "https://cdn-icons-png.flaticon.com/512/1063/1063376.png",
+    assignment: "https://cdn-icons-png.flaticon.com/512/3524/3524335.png",
   };
 
   const user = JSON.parse(localStorage.getItem("user"));
 
   return (
-    <div className="sidebar bg-white border-end h-100 pt-3">
-      <Nav className="flex-column gap-2 px-2">
+    <div className="sidebar bg-white border-end pt-3">
+      <Nav className="flex-column gap-2 px-2 pb-5">
         <Nav.Link
           as={NavLink}
           to="/achievers"
@@ -73,7 +74,7 @@ function Sidebar() {
           />
           <span className="fw-medium">Arena</span>
         </Nav.Link>
-                <Nav.Link
+        <Nav.Link
           as={NavLink}
           to="/achieve-management"
           className="sidebar-link d-flex align-items-center gap-3 px-1 py-2 rounded text-decoration-none"
@@ -85,6 +86,22 @@ function Sidebar() {
           />
           <span className="fw-medium">Submission Approval</span>
         </Nav.Link>
+        {(user?.role === "admin" ||
+          user?.role === "instructor" ||
+          user?.role === "staff") && (
+          <Nav.Link
+            as={NavLink}
+            to="/manage-assignments"
+            className="sidebar-link d-flex align-items-center gap-3 px-1 py-2 rounded text-decoration-none"
+          >
+            <img
+              src={icons.assignment}
+              alt="icon"
+              style={{ width: "20px", height: "20px", objectFit: "contain" }}
+            />
+            <span className="fw-medium">Manage Assignments</span>
+          </Nav.Link>
+        )}
         {user?.role === "admin" && (
           <>
             <Nav.Link
@@ -161,7 +178,7 @@ function Sidebar() {
           />
           <span className="fw-medium">Careers</span>
         </Nav.Link>
-
+        {/* This item was moved up */}
       </Nav>
     </div>
   );

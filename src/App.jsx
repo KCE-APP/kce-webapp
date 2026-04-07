@@ -19,6 +19,7 @@ import SemesterPage from "./Pages/Semester/SemesterPage";
 import RewardCatalogPage from "./Pages/Rewards/RewardCatalogPage";
 import RedemptionHistoryPage from "./Pages/Rewards/RedemptionHistoryPage";
 import CareersPage from "./Pages/Careers/CareersPage";
+import ManageAssignmentsPage from "./Pages/ManageAssignments/ManageAssignmentsPage";
 
 function MainLayout() {
   return (
@@ -43,6 +44,10 @@ function MainLayout() {
                 element={<AchievementDetails />}
               />
               <Route path="/users" element={<UsersPage />} />
+              <Route
+                path="/manage-assignments"
+                element={<ManageAssignmentsPage />}
+              />
               <Route
                 path="/redemption-history"
                 element={<RedemptionHistoryPage />}
