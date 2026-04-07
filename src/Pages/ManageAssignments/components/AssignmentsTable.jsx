@@ -36,6 +36,7 @@ const AssignmentsTable = ({
   onFilterBatchChange,
   filterSem,
   onFilterSemChange,
+  onViewSubmissions,
 }) => {
   return (
     <div className="assignments-table-container">
@@ -180,12 +181,11 @@ const AssignmentsTable = ({
                       </div>
                     </td>
                     <td className="text-center">
-                      <div className="d-inline-flex flex-column align-items-center bg-primary-subtle p-2 rounded-3 border border-primary-subtle" style={{ minWidth: "75px" }}>
-                        <PeopleIcon style={{ fontSize: "14px", color: "#0d6efd" }} className="mb-1" />
-                        <span className="fw-bold text-primary" style={{ fontSize: "0.95rem" }}>
+                      <div className="d-inline-flex align-items-center bg-primary-subtle px-3 py-1 rounded-pill border border-primary-subtle gap-2">
+                        <PeopleIcon style={{ fontSize: "16px", color: "#0d6efd" }} />
+                        <span className="fw-bold text-primary" style={{ fontSize: "0.9rem" }}>
                           {item.assignedStudents?.length || 0}
                         </span>
-                        <span className="text-uppercase fw-bold text-primary-emphasis opacity-50" style={{ fontSize: "0.6rem" }}>Students</span>
                       </div>
                     </td>
                     <td>
@@ -201,6 +201,14 @@ const AssignmentsTable = ({
                     </td>
                     <td className="px-4 text-center">
                       <div className="d-flex justify-content-center gap-2">
+                        
+                        <button 
+                          className="btn btn-sm btn-link text-info p-1 border-0" 
+                          title="View Submissions"
+                          onClick={() => onViewSubmissions(item)}
+                        >
+                          <PeopleIcon style={{ fontSize: "20px" }} />
+                        </button>
                         <button 
                           className="btn btn-sm btn-link text-primary p-1 border-0" 
                           title="Edit"
