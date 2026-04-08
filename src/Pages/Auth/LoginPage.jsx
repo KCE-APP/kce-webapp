@@ -5,10 +5,12 @@ import api from "../../api/axios";
 import "./auth.css";
 import Swal from "sweetalert2";
 import KI_LOGO3 from "../../assets/KI_LOGO3.png";
+import { Eye, EyeOff } from "lucide-react";
 
 const LoginPage = () => {
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
   const [errors, setErrors] = useState({});
   const [loading, setLoading] = useState(false);
   const navigate = useNavigate();
@@ -203,18 +205,31 @@ const LoginPage = () => {
 
               <Form.Group className="mb-4" controlId="formBasicPassword">
                 <Form.Label className="form-label-custom">Password</Form.Label>
-                <Form.Control
-                  type="password"
-                  placeholder="Password"
-                  value={password}
-                  onChange={(e) => {
-                    setPassword(e.target.value);
-                    if (errors.password)
-                      setErrors({ ...errors, password: null });
-                  }}
-                  isInvalid={!!errors.password}
-                  className="modern-input"
-                />
+                <div className="password-field-wrapper">
+                  <Form.Control
+                    type={showPassword ? "text" : "password"}
+                    placeholder="Password"
+                    value={password}
+                    onChange={(e) => {
+                      setPassword(e.target.value);
+                      if (errors.password)
+                        setErrors({ ...errors, password: null });
+                    }}
+                    isInvalid={!!errors.password}
+                    className="modern-input"
+                  />
+                  <button
+                    type="button"
+                    className="password-toggle-btn"
+                    onClick={() => setShowPassword(!showPassword)}
+                  >
+                    {showPassword ? (
+                      <EyeOff size={20} />
+                    ) : (
+                      <Eye size={20} />
+                    )}
+                  </button>
+                </div>
                 <Form.Control.Feedback type="invalid">
                   {errors.password}
                 </Form.Control.Feedback>
