@@ -28,6 +28,7 @@ const ManageAssignmentsPage = () => {
   const [isDirty, setIsDirty] = useState(false);
   const [showConfirmModal, setShowConfirmModal] = useState(false);
   const [nextTab, setNextTab] = useState(null);
+  const [isSavingFromModal, setIsSavingFromModal] = useState(false);
   const formRef = useRef();
 
   const loadData = async () => {
@@ -92,12 +93,22 @@ const ManageAssignmentsPage = () => {
         });
       }
       setIsDirty(false);
-      setActiveTab("list");
+      setShowConfirmModal(false);
+      
+      // If saving from modal, navigate to nextTab; otherwise navigate to list
+      if (isSavingFromModal && nextTab) {
+        setActiveTab(nextTab);
+        setIsSavingFromModal(false);
+        setNextTab(null);
+      } else {
+        setActiveTab("list");
+      }
       setEditingItem(null);
       loadData();
     } catch (error) {
       console.error("Failed to save assignment", error);
       Swal.fire("Error", "Failed to save assignment details", "error");
+      setIsSavingFromModal(false);
     }
   };
 
@@ -157,9 +168,12 @@ const ManageAssignmentsPage = () => {
       setActiveTab(k);
       if (k === "list") {
         setEditingItem(null);
-        setViewMode("list"); // Reset to list when switching back to View Assignments
+        setViewMode("list");
+        setIsDirty(false); // Reset dirty state when going to list
       } else if (k === "form") {
-        setViewMode("list"); // Switch out of submissions if going to Add New
+        setViewMode("list");
+        // Reset dirty state when entering form (whether create or edit)
+        setIsDirty(false);
       }
     }
   };
@@ -169,8 +183,19 @@ const ManageAssignmentsPage = () => {
     setShowConfirmModal(false);
     if (nextTab) {
       setActiveTab(nextTab);
-      if (nextTab === "list") setEditingItem(null);
+      if (nextTab === "list") {
+        setEditingItem(null);
+        setViewMode("list");
+      }
       setNextTab(null);
+    }
+  };
+
+  const handleSaveFromModal = async () => {
+    setIsSavingFromModal(true);
+    const success = await formRef.current?.submitForm?.();
+    if (!success) {
+      setIsSavingFromModal(false);
     }
   };
 
@@ -271,7 +296,7 @@ const ManageAssignmentsPage = () => {
           <Modal.Title className="h6 fw-bold">Unsaved Changes</Modal.Title>
         </Modal.Header>
         <Modal.Body>
-          You have unsaved changes in the form. Do you want to discard them?
+          You have unsaved changes in the form. Do you want to save or discard them?
         </Modal.Body>
         <Modal.Footer>
           <Button variant="light" onClick={() => setShowConfirmModal(false)}>
@@ -279,6 +304,9 @@ const ManageAssignmentsPage = () => {
           </Button>
           <Button variant="danger" onClick={handleConfirmDiscard}>
             Discard Changes
+          </Button>
+          <Button variant="success" onClick={handleSaveFromModal}>
+            Save Changes
           </Button>
         </Modal.Footer>
       </Modal>
