@@ -5,9 +5,9 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import PersonIcon from "@mui/icons-material/Person";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import RateReviewIcon from "@mui/icons-material/RateReview";
-import ImageIcon from "@mui/icons-material/Image";
 import LinkIcon from "@mui/icons-material/Link";
 import TablePlaceholder from "../../../component/TablePlaceholder";
+import SecureImage from "../../../component/SecureImage";
 import api from "../../../api/axios";
 import ReviewSubmissionModal from "./ReviewSubmissionModal";
 import Swal from "sweetalert2";
@@ -20,7 +20,6 @@ const SubmissionsList = ({ assignment, onBack }) => {
   const [totalPages, setTotalPages] = useState(1);
   const [searchTerm, setSearchTerm] = useState("");
   const [filterStatus, setFilterStatus] = useState("all");
-  const [imageLoadErrors, setImageLoadErrors] = useState({});
 
   const [reviewModalShow, setReviewModalShow] = useState(false);
   const [selectedSubmission, setSelectedSubmission] = useState(null);
@@ -62,13 +61,6 @@ const SubmissionsList = ({ assignment, onBack }) => {
     loadSubmissions();
     setReviewModalShow(false);
     setSelectedSubmission(null);
-  };
-
-  const handleImageError = (submissionId) => {
-    setImageLoadErrors((prev) => ({
-      ...prev,
-      [submissionId]: true,
-    }));
   };
 
   const getStatusBadge = (status) => {
@@ -194,21 +186,16 @@ const SubmissionsList = ({ assignment, onBack }) => {
                             overflow: "hidden"
                           }}
                         >
-                          {imageLoadErrors[sub._id] ? (
-                            <ImageIcon style={{ fontSize: "32px", color: "#999" }} />
-                          ) : (
-                            <img 
-                              src={formatImageUrl(sub.fileUrl)} 
-                              alt="Submission" 
-                              style={{ 
-                                height: "100%", 
-                                width: "100%", 
-                                objectFit: "cover", 
-                                borderRadius: "3px" 
-                              }}
-                              onError={() => handleImageError(sub._id)}
-                            />
-                          )}
+                          <SecureImage 
+                            src={formatImageUrl(sub.fileUrl)} 
+                            alt="Submission" 
+                            style={{ 
+                              height: "100%", 
+                              width: "100%", 
+                              objectFit: "cover", 
+                              borderRadius: "3px" 
+                            }}
+                          />
                         </div>
                       ) : sub.submissionLink ? (
                         <Badge 

@@ -116,8 +116,8 @@ export default function AchieverBoardContainer() {
   const handleDelete = async (rollNo, submissionId) => {
     try {
       await api.delete(`/rewards/submission/${submissionId}`);
-      const updated = data.filter((student) => student.rollNo !== rollNo);
-      setData(updated);
+      // Refresh the list after successful deletion
+      await fetchSubmission();
     } catch (error) {
       console.error("Delete failed:", error);
       throw error;

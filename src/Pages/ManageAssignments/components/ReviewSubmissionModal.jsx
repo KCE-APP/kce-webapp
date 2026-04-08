@@ -6,6 +6,7 @@ import FileDownloadIcon from "@mui/icons-material/FileDownload";
 import ErrorIcon from "@mui/icons-material/Error";
 import CalendarMonthIcon from "@mui/icons-material/CalendarMonth";
 import { formatImageUrl } from "../../../utils/ImageUrlFormat";
+import SecureImage from "../../../component/SecureImage";
 
 const ReviewSubmissionModal = ({ show, onHide, submission, onSuccess }) => {
   const [formData, setFormData] = useState({
@@ -16,7 +17,6 @@ const ReviewSubmissionModal = ({ show, onHide, submission, onSuccess }) => {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState(null);
   const [showFilePreview, setShowFilePreview] = useState(false);
-  const [imageError, setImageError] = useState(false);
 
   useEffect(() => {
     if (submission) {
@@ -282,21 +282,12 @@ const ReviewSubmissionModal = ({ show, onHide, submission, onSuccess }) => {
           <Modal.Title className="fw-bold h5">Submission Preview</Modal.Title>
         </Modal.Header>
         <Modal.Body className="text-center p-0 bg-light" style={{ minHeight: "400px", display: "flex", alignItems: "center", justifyContent: "center" }}>
-          {imageError ? (
-            <div className="text-center text-danger">
-              <ErrorIcon style={{ fontSize: "48px", marginBottom: "10px" }} />
-              <p className="mb-0 fw-bold">Failed to load image</p>
-              <p className="small text-muted mb-3">The image file could not be loaded. Click Download to view the file.</p>
-              <p className="small text-muted" style={{ fontSize: "0.8rem", wordBreak: "break-all" }}>URL: {getFileUrl()}</p>
-            </div>
-          ) : (
-            <img 
-              src={getFileUrl()} 
-              alt="Submission preview" 
-              style={{ maxWidth: "100%", maxHeight: "600px", objectFit: "contain" }}
-              onError={() => setImageError(true)}
-            />
-          )}
+          <SecureImage
+            src={getFileUrl()}
+            alt="Submission preview"
+            className="w-100 d-block"
+            style={{ maxHeight: "600px", objectFit: "contain" }}
+          />
         </Modal.Body>
         <Modal.Footer className="border-0">
           <Button 
