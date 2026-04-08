@@ -161,21 +161,21 @@ const SubmissionsList = ({ assignment, onBack }) => {
                           <PersonIcon />
                         </div>
                         <div>
-                          <p className="mb-0 fw-bold text-dark">{sub.student?.name || "Unknown Student"}</p>
-                          <p className="mb-0 text-muted small">{sub.student?.email || "-"}</p>
+                          <p className="mb-0 fw-bold text-dark">{sub.studentId?.name || "Unknown Student"}</p>
+                          <p className="mb-0 text-muted small">{sub.studentId?.rollNo || "-"} • {sub.studentId?.department || "-"}</p>
                         </div>
                       </div>
                     </td>
                     <td className="py-3">
                       <div className="d-flex align-items-center gap-1 text-muted small">
                         <CalendarMonthIcon style={{ fontSize: "16px" }} />
-                        {new Date(sub.createdAt).toLocaleDateString()}
+                        {new Date(sub.submittedAt || sub.createdAt).toLocaleDateString()}
                       </div>
                     </td>
                     <td className="py-3">{getStatusBadge(sub.status)}</td>
                     <td className="py-3">
                       <span className={`fw-bold ${sub.marks >= 40 ? "text-success" : "text-danger"}`}>
-                        {sub.marks !== undefined ? sub.marks : "-"}
+                        {sub.marks !== null && sub.marks !== undefined ? sub.marks : "-"}
                       </span>
                     </td>
                     <td className="py-3">

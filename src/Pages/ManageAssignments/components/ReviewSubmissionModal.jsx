@@ -72,10 +72,23 @@ const ReviewSubmissionModal = ({ show, onHide, submission, onSuccess }) => {
       </Modal.Header>
       <Modal.Body className="px-4 py-3">
         {submission && (
-          <div className="mb-4 bg-light p-3 rounded-3 border-start border-4 border-primary">
-            <div className="small text-muted mb-1 text-uppercase fw-bold">Student</div>
-            <div className="fw-bold text-dark">{submission.student?.name}</div>
-            <div className="small text-muted">{submission.student?.email}</div>
+          <div className="mb-4 bg-light p-3 rounded-3 border-start border-4 border-primary d-flex justify-content-between align-items-center">
+            <div>
+              <div className="small text-muted mb-1 text-uppercase fw-bold">Student</div>
+              <div className="fw-bold text-dark">{submission.studentId?.name}</div>
+              <div className="small text-muted">{submission.studentId?.rollNo} • {submission.studentId?.department}</div>
+            </div>
+            {submission.fileUrl && (
+              <Button 
+                variant="outline-primary" 
+                size="sm"
+                className="rounded-pill px-3"
+                href={`${import.meta.env.VITE_IMAGE_BASE_URL}/${submission.fileUrl}`}
+                target="_blank"
+              >
+                View Submission
+              </Button>
+            )}
           </div>
         )}
 
