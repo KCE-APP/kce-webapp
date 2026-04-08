@@ -14,6 +14,7 @@ import CalendarTodayIcon from "@mui/icons-material/CalendarToday";
 import MenuOpenIcon from "@mui/icons-material/MenuOpen";
 import LayersIcon from "@mui/icons-material/Layers";
 import TablePlaceholder from "../../../component/TablePlaceholder";
+import { decodeHtmlAndStripTags } from "../utils/htmlHelper";
 const DEPARTMENTS = [
   "IT", "CSE", "ECE", "EEE", "ETE", "CST", "CY", "MECH", "CIVIL", "AIDS", "CSBS", "CSD", "MBA", "MCA", "MCT"
 ];
@@ -138,7 +139,7 @@ const AssignmentsTable = ({
                       <div className="d-flex flex-column">
                         <span className="fw-bold text-dark">{item.title}</span>
                         <span className="text-muted small text-truncate" style={{ maxWidth: "200px" }}>
-                          {item.description?.replace(/<[^>]+>/g, '') || "No description"}
+                          {decodeHtmlAndStripTags(item.description) || "No description"}
                         </span>
                         {/* <div className="mt-1">
                           <span className={`badge rounded-pill fw-bold bg-warning-subtle text-warning-emphasis px-2`} style={{ fontSize: '0.65rem' }}>

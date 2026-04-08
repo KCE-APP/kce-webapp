@@ -45,6 +45,40 @@ const AssignmentForm = forwardRef(({ initialData, onSave, onCancel, setIsDirty }
 
   const [errors, setErrors] = useState({});
 
+  // Helper function to check if form has changed from initial data
+  const hasChangesFromInitial = (currentForm, initial) => {
+    if (!initial) {
+      // If no initial data (creating new), always return false
+      // The form starts empty and should be considered unmodified
+      return false;
+    }
+    
+    // For edit mode, compare with initial data
+    const initialForm = {
+      title: initial.title || "",
+      description: initial.description || "",
+      instructions: initial.instructions || "",
+      department: initial.department || "",
+      batch: initial.batch || "",
+      semester: initial.semester || "",
+      resourceLink: initial.resourceLink || "",
+      submissionType: initial.submissionType || "none",
+      dueDate: initial.dueDate ? initial.dueDate.split("T")[0] : "",
+    };
+    
+    return (
+      currentForm.title !== initialForm.title ||
+      currentForm.description !== initialForm.description ||
+      currentForm.instructions !== initialForm.instructions ||
+      currentForm.department !== initialForm.department ||
+      currentForm.batch !== initialForm.batch ||
+      currentForm.semester !== initialForm.semester ||
+      currentForm.resourceLink !== initialForm.resourceLink ||
+      currentForm.submissionType !== initialForm.submissionType ||
+      currentForm.dueDate !== initialForm.dueDate
+    );
+  };
+
   useImperativeHandle(ref, () => ({
     submitForm: async () => {
       if (validate()) {
@@ -76,8 +110,30 @@ const AssignmentForm = forwardRef(({ initialData, onSave, onCancel, setIsDirty }
         certificateRequired: true,
         dueDate: initialData.dueDate ? initialData.dueDate.split("T")[0] : "",
       });
+    } else {
+      // Reset form for create mode
+      setForm({
+        title: "",
+        description: "",
+        instructions: "",
+        department: "",
+        batch: "",
+        semester: "",
+        type: "certification",
+        resourceLink: "",
+        submissionType: "none",
+        submissionRequired: true,
+        certificateRequired: true,
+        dueDate: "",
+      });
     }
-  }, [initialData]);
+    
+    // Always reset dirty state when form initializes/changes
+    if (setIsDirty) {
+      setIsDirty(false);
+    }
+    setErrors({});
+  }, [initialData, setIsDirty]);
 
   const validate = () => {
     const newErrors = {};
@@ -116,23 +172,34 @@ const AssignmentForm = forwardRef(({ initialData, onSave, onCancel, setIsDirty }
 
   const handleChange = (e) => {
     const { name, value, type, checked } = e.target;
-    setForm((prev) => ({
-      ...prev,
+    const newForm = {
+      ...form,
       [name]: type === "checkbox" ? checked : value,
-    }));
+    };
+    setForm(newForm);
     
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: null }));
     }
-    if (setIsDirty) setIsDirty(true);
+    
+    // Update dirty state based on actual changes from initial data
+    if (setIsDirty) {
+      setIsDirty(hasChangesFromInitial(newForm, initialData));
+    }
   };
 
   const handleEditorChange = (name, value) => {
-    setForm((prev) => ({ ...prev, [name]: value }));
+    const newForm = { ...form, [name]: value };
+    setForm(newForm);
+    
     if (errors[name]) {
       setErrors((prev) => ({ ...prev, [name]: null }));
     }
-    if (setIsDirty) setIsDirty(true);
+    
+    // Update dirty state based on actual changes from initial data
+    if (setIsDirty) {
+      setIsDirty(hasChangesFromInitial(newForm, initialData));
+    }
   };
 
   const handleSubmit = async (e) => {

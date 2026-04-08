@@ -285,40 +285,34 @@ const AchieversForm = forwardRef(
         }
       }
 
-      // Validate students (Mandatory in both modes)
-      if (studentCount <= 0) {
-        newErrors.studentCount = "Value should not be zero";
-        newErrors.evidence = "Please add at least one student";
-      } else if (studentCount > 10) {
-        newErrors.studentCount = "Maximum 10 students allowed";
-        newErrors.evidence = "You can add up to 10 students only";
-      } else {
-        const invalidStudents = form.students.some((s) => {
-          const name = s.name || "";
-          const rollNo = s.rollNo || "";
-          const year = s.year || "";
-          const dept = s.dept || "";
-          const otherDept = s.otherDept || "";
+      // Validate students only in manual entry mode
+      if (entryType === "manual") {
+        if (studentCount <= 0) {
+          newErrors.studentCount = "Value should not be zero";
+          newErrors.evidence = "Please add at least one student";
+        } else if (studentCount > 10) {
+          newErrors.studentCount = "Maximum 10 students allowed";
+          newErrors.evidence = "You can add up to 10 students only";
+        } else {
+          const invalidStudents = form.students.some((s) => {
+            const name = s.name || "";
+            const rollNo = s.rollNo || "";
+            const year = s.year || "";
+            const dept = s.dept || "";
+            const otherDept = s.otherDept || "";
 
-          const nameInvalid = !name.trim();
-          const rollNoInvalid = !rollNo.trim();
-          
-          // Year and Dept are only mandatory in Manual mode
-          let yearInvalid = false;
-          let deptInvalid = false;
-          
-          if (entryType === "manual") {
-            yearInvalid = !year.trim();
-            deptInvalid = !dept.trim() || (dept === "Others" && !otherDept.trim());
+            const nameInvalid = !name.trim();
+            const rollNoInvalid = !rollNo.trim();
+            const yearInvalid = !year.trim();
+            const deptInvalid = !dept.trim() || (dept === "Others" && !otherDept.trim());
+
+            return nameInvalid || rollNoInvalid || yearInvalid || deptInvalid;
+          });
+
+          if (invalidStudents) {
+            newErrors.evidence = `Please fill all required student fields (Name, Roll No, Year, Dept)`;
+            newErrors.studentErrors = true;
           }
-
-          return nameInvalid || rollNoInvalid || yearInvalid || deptInvalid;
-        });
-
-        if (invalidStudents) {
-          const requiredFields = entryType === "manual" ? "(Name, Roll No, Year, Dept)" : "(Name, Roll No)";
-          newErrors.evidence = `Please fill all required student fields ${requiredFields}`;
-          newErrors.studentErrors = true;
         }
       }
 
