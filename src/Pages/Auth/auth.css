@@ -172,3 +172,46 @@
 .login-card {
     animation: fadeInUp 0.5s ease-out;
 }
+
+/* Password Field Wrapper */
+.password-field-wrapper {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-field-wrapper .modern-input {
+    padding-right: 45px;
+    margin-bottom: 0.5rem;
+}
+
+/* Password Toggle Button */
+.password-toggle-btn {
+    position: absolute;
+    right: 12px;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #64748b;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: all 0.2s ease;
+    z-index: 10;
+}
+
+.password-toggle-btn:hover {
+    color: #f97316;
+    transform: translateY(-50%) scale(1.1);
+}
+
+.password-toggle-btn:active {
+    transform: translateY(-50%) scale(0.95);
+}
+
+.password-toggle-btn svg {
+    stroke-width: 2;
+}
