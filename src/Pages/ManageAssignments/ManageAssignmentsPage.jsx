@@ -155,6 +155,64 @@ const ManageAssignmentsPage = () => {
     setViewMode("submissions");
   };
 
+  const handleReassign = async (item) => {
+    Swal.fire({
+      title: "Reassign Students",
+      text: `Are you sure you want to reassign "${item.title}" to newly registered students?`,
+      icon: "question",
+      showCancelButton: true,
+      confirmButtonColor: "#f3773a",
+      cancelButtonColor: "#6c757d",
+      confirmButtonText: "Reassign",
+      showLoaderOnConfirm: true,
+      preConfirm: async () => {
+        try {
+          const res = await api.post(`/assignments/${item._id}/reassign`, {});
+          return res.data;
+        } catch (error) {
+          let errorMessage = "Server error";
+          if (error.response?.status === 404) {
+            errorMessage = "Assignment not found";
+          } else if (error.response?.data?.message) {
+            errorMessage = error.response.data.message;
+          }
+          Swal.showValidationMessage(`Request failed: ${errorMessage}`);
+        }
+      },
+      allowOutsideClick: () => !Swal.isLoading(),
+    }).then((result) => {
+      if (result.isConfirmed) {
+        const data = result.value;
+        const newlyAssigned = data?.newlyAssignedCount || 0;
+        const totalAssigned = data?.totalAssignedCount || 0;
+
+        if (newlyAssigned > 0) {
+          Swal.fire({
+            toast: true,
+            position: "top-end",
+            icon: "success",
+            title: `${newlyAssigned} student${newlyAssigned !== 1 ? 's' : ''} assigned!`,
+            text: `Total assigned: ${totalAssigned}`,
+            showConfirmButton: false,
+            timer: 4000,
+          });
+        } else {
+          Swal.fire({
+            toast: true,
+            position: "top-end",
+            icon: "info",
+            title: "No new students to assign",
+            text: `Total assigned: ${totalAssigned}`,
+            showConfirmButton: false,
+            timer: 4000,
+          });
+        }
+        
+        loadData();
+      }
+    });
+  };
+
   const handleBackToAssignments = () => {
     setSelectedAssignment(null);
     setViewMode("list");
@@ -249,6 +307,7 @@ const ManageAssignmentsPage = () => {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onViewSubmissions={handleViewSubmissions}
+            onReassign={handleReassign}
             currentPage={currentPage}
             totalPages={totalPages}
             onPageChange={setCurrentPage}
