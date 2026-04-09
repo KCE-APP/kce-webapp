@@ -5,6 +5,7 @@ import FilterListIcon from "@mui/icons-material/FilterList";
 import EditIcon from "@mui/icons-material/Edit";
 import DeleteOutlineIcon from "@mui/icons-material/DeleteOutline";
 import MoreVertIcon from "@mui/icons-material/MoreVert";
+import RefreshIcon from "@mui/icons-material/Refresh";
 import BusinessIcon from "@mui/icons-material/Business";
 import SchoolIcon from "@mui/icons-material/School";
 import PeopleIcon from "@mui/icons-material/People";
@@ -38,6 +39,7 @@ const AssignmentsTable = ({
   filterSem,
   onFilterSemChange,
   onViewSubmissions,
+  onReassign,
 }) => {
   return (
     <div className="assignments-table-container">
@@ -209,6 +211,13 @@ const AssignmentsTable = ({
                           onClick={() => onViewSubmissions(item)}
                         >
                           <PeopleIcon style={{ fontSize: "20px" }} />
+                        </button>
+                        <button 
+                          className="btn btn-sm btn-link text-warning p-1 border-0" 
+                          title="Reassign Students"
+                          onClick={() => onReassign(item)}
+                        >
+                          <RefreshIcon style={{ fontSize: "20px" }} />
                         </button>
                         <button 
                           className="btn btn-sm btn-link text-primary p-1 border-0" 

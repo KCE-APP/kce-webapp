@@ -153,7 +153,7 @@ export default function PointRulesTable({
                           }}
                         >
                           <StarsIcon style={{ fontSize: "16px" }} />
-                          {rule.points} Points
+                          {rule.points} 
                         </span>
                       </td>
                       <td className="pe-4 text-end py-3">

@@ -221,7 +221,7 @@ export default function RewardCatalogTable({
                   </th>
                   <th style={{ width: "20%" }}>Category</th>
                   <th className="text-center" style={{ width: "15%" }}>
-                    Cost
+                    Target Points
                   </th>
                   <th className="text-center" style={{ width: "15%" }}>
                     Stock
