@@ -15,6 +15,7 @@ import Swal from "sweetalert2";
 import TablePlaceholder from "../../component/TablePlaceholder";
 import api from "../../api/axios";
 import SecureImage from "../../component/SecureImage";
+import { formatImageUrl } from "../../utils/ImageUrlFormat";
 
 export default function EventsTable({
   data,
@@ -534,14 +535,3 @@ function getBadgeClassOfCollege(college) {
   }
 }
 
-function formatImageUrl(url) {
-  if (!url) return "";
-
-  if (!url.startsWith("http") && !url.startsWith("https")) {
-    const cleanPath = url.replace(/\\/g, "/");
-    // console.log(`${import.meta.env.VITE_IMAGE_BASE_URL}/${cleanPath}`);
-    return `${import.meta.env.VITE_IMAGE_BASE_URL}/${cleanPath}`;
-  }
-
-  return url;
-}

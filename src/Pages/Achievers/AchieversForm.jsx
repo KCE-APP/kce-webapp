@@ -3,6 +3,7 @@ import { Form, Button, Row, Col, Card } from "react-bootstrap";
 import ReactQuill from "react-quill-new";
 import "quill/dist/quill.snow.css";
 import api from "../../api/axios";
+import { formatImageUrl } from "../../utils/ImageUrlFormat";
 
 const AchieversForm = forwardRef(
   ({ initialData, onSave, onCancel, setIsDirty }, ref) => {
@@ -664,11 +665,9 @@ const AchieversForm = forwardRef(
                       <div className="mt-3 p-2 border rounded bg-light d-inline-block">
                         <img
                           src={
-                            typeof form.posterImage === "string"
-                              ? form.posterImage.startsWith("http")
-                                ? form.posterImage
-                                : `${import.meta.env.VITE_IMAGE_BASE_URL}/${form.posterImage.replace(/\\/g, "/")}`
-                              : URL.createObjectURL(form.posterImage)
+                            form.posterImage instanceof File
+                              ? URL.createObjectURL(form.posterImage)
+                              : formatImageUrl(form.posterImage)
                           }
                           alt="Preview"
                           className="rounded"
@@ -681,7 +680,7 @@ const AchieversForm = forwardRef(
 
                 <div>
                   <Form.Group controlId="formStudentCount" className="mb-3">
-                    <Form.Label>Number of Achievers <span className="text-danger">*</span> (Max:10)</Form.Label>
+                    <Form.Label>Number of Achievers  (Max:10)</Form.Label>
                     <Form.Control
                       type="number"
                       min="0"
@@ -872,14 +871,7 @@ const AchieversForm = forwardRef(
                                         <div className="d-flex align-items-center gap-2">
                                           {student.imageUrl && (
                                             <img
-                                              src={
-                                                student.imageUrl.startsWith(
-                                                  "blob:",
-                                                ) ||
-                                                student.imageUrl.startsWith("http")
-                                                  ? student.imageUrl
-                                                  : `${import.meta.env.VITE_IMAGE_BASE_URL}/${student.imageUrl.replace(/\\/g, "/")}`
-                                              }
+                                              src={formatImageUrl(student.imageUrl)}
                                               alt="Preview"
                                               className="rounded-circle object-fit-cover"
                                               style={{
@@ -958,24 +950,3 @@ const AchieversForm = forwardRef(
 export default AchieversForm;
 
 // Helper to fix Google Drive image links for embedding
-function formatImageUrl(url) {
-  if (!url) return "";
-
-  // Check if it is a Google Drive link
-  if (url.includes("drive.google.com") || url.includes("docs.google.com")) {
-    // Try to extract the ID
-    let id = "";
-    const parts = url.match(/\/d\/(.*?)\/|id=(.*?)(&|$)/);
-
-    if (parts) {
-      id = parts[1] || parts[2];
-    }
-
-    if (id) {
-      // Return a thumbnail URL which is more reliable for embedding (sz=w1000 requests a large 1000px wide image)
-      return `https://drive.google.com/thumbnail?id=${id}&sz=w1000`;
-    }
-  }
-
-  return url;
-}
