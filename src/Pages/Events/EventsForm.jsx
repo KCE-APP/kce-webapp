@@ -2,6 +2,7 @@ import { useState, useEffect, forwardRef, useImperativeHandle } from "react";
 import { Form, Button, Row, Col, Card } from "react-bootstrap";
 import ReactQuill from "react-quill-new";
 import "quill/dist/quill.snow.css";
+import { formatImageUrl } from "../../utils/ImageUrlFormat";
 
 const getNextDay = (dateString) => {
   if (!dateString) return undefined;
@@ -367,11 +368,9 @@ const EventsForm = forwardRef(
                     <div className="mt-3 p-2 border rounded bg-light d-inline-block">
                       <img
                         src={
-                          typeof form.eventImage === "string"
-                            ? form.eventImage.startsWith("http")
-                              ? form.eventImage
-                              : `${import.meta.env.VITE_IMAGE_BASE_URL}/${form.eventImage.replace(/\\/g, "/")}`
-                            : URL.createObjectURL(form.eventImage)
+                          form.eventImage instanceof File
+                            ? URL.createObjectURL(form.eventImage)
+                            : formatImageUrl(form.eventImage)
                         }
                         alt="Preview"
                         className="rounded"

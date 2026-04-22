@@ -7,6 +7,7 @@ import DeleteIcon from "@mui/icons-material/DeleteOutline";
 import { Tooltip } from "@mui/material";
 import SecureImage from "../../../component/SecureImage";
 import TablePlaceholder from "../../../component/TablePlaceholder";
+import { formatImageUrl } from "../../../utils/ImageUrlFormat";
 
 
 const REACTION_TYPES = [
@@ -66,11 +67,6 @@ export default function CareerTable({
     career.description?.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
-  const formatImageUrl = (url) => {
-    if (!url || typeof url !== "string") return "";
-    if (url.startsWith("http") || url.startsWith("https")) return url;
-    return `${import.meta.env.VITE_IMAGE_BASE_URL}/${url.replace(/\\/g, "/")}`;
-  };
 
   return (
     <>

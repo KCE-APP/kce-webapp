@@ -26,6 +26,7 @@ import KCELogo from "../../assets/KCE_LOGO.webp";
 import KITLogo from "../../assets/KIT-LOGO.png";
 import TablePlaceholder from "../../component/TablePlaceholder";
 import SecureImage from "../../component/SecureImage";
+import { formatImageUrl } from "../../utils/ImageUrlFormat";
 const REACTION_TYPES = [
   {
     id: "clap",
@@ -702,15 +703,4 @@ function getAvatarColor(name) {
 
   const index = Math.abs(hash) % bgColors.length;
   return { bg: bgColors[index], text: textColors[index] };
-}
-function formatImageUrl(url) {
-  if (!url || typeof url !== "string") return "";
-
-  if (!url.startsWith("http") && !url.startsWith("https")) {
-    const cleanPath = url.replace(/\\/g, "/");
-    console.log(`${import.meta.env.VITE_IMAGE_BASE_URL}/${cleanPath}`);
-    return `${import.meta.env.VITE_IMAGE_BASE_URL}/${cleanPath}`;
-  }
-
-  return url;
 }

@@ -1,6 +1,7 @@
 import React from "react";
 import { Modal, Form, Row, Col, Button, Spinner } from "react-bootstrap";
 import SecureImage from "../../../component/SecureImage";
+import { formatImageUrl } from "../../../utils/ImageUrlFormat";
 
 
 const CareerModal = ({ show, onHide, onSubmit, formData, handleInputChange, handleFileChange, submitting, editingId, validated, initialData, primaryColor }) => {
@@ -172,11 +173,6 @@ const CareerModal = ({ show, onHide, onSubmit, formData, handleInputChange, hand
   );
 };
 
-const formatImageUrl = (url) => {
-  if (!url || typeof url !== "string") return "";
-  if (url.startsWith("http") || url.startsWith("https") || url.startsWith("blob:")) return url;
-  return `${import.meta.env.VITE_IMAGE_BASE_URL}/${url.replace(/\\/g, "/")}`;
-};
 
 export default CareerModal;
 

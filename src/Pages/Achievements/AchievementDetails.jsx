@@ -5,6 +5,7 @@ import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import api from "../../api/axios";
 import AchievementDetailsPlaceholder, { SkeletonBox } from "../../component/AchievementDetailsPlaceholder";
 import SecureImage from "../../component/SecureImage";
+import { formatImageUrl } from "../../utils/ImageUrlFormat";
 
 export default function AchievementDetails() {
   const [processing, setProcessing] = useState(false);
@@ -447,16 +448,6 @@ export default function AchievementDetails() {
   );
 }
 
-function formatImageUrl(url) {
-  if (!url || typeof url !== "string") return "";
-
-  if (!url.startsWith("http") && !url.startsWith("https")) {
-    const cleanPath = url.replace(/\\/g, "/");
-    return `${import.meta.env.VITE_IMAGE_BASE_URL}/${cleanPath}`;
-  }
-
-  return url;
-}
 
 const Label = ({ children }) => (
   <div style={{ fontSize: "13px", color: "#6e6e73", marginBottom: "6px" }}>
